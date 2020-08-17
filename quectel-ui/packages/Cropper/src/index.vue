@@ -63,7 +63,7 @@
 <script>
 import { VueCropper } from 'vue-cropper'
 export default {
-  name: 'Cropper',
+  name: 'QCropper',
   components: { VueCropper },
   props: {
     // 组件高度

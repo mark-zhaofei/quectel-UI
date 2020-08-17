@@ -32,7 +32,7 @@
 </template>
 <script>
 export default {
-  name: 'InputTree',
+  name: 'QInputTree',
   props: {
     option: {
       type: Object,

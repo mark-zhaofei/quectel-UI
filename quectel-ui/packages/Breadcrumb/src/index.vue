@@ -12,7 +12,7 @@
 <script>
 
 export default {
-  name: 'Breadcrumb', 
+  name: 'QBreadcrumb', 
   data() {
     return {
       levelList: null

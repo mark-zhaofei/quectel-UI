@@ -226,7 +226,7 @@
 
 <script>
 export default {
-  name: 'FormDialog',
+  name: 'QFormDialog',
   props: {
     // 表单列表
     formList: {

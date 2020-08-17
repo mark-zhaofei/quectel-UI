@@ -8,7 +8,7 @@
 </template>
 <script>
 export default {
-  name: 'NoData',
+  name: 'QNoData',
   components: {},
   props: {
     showImg: {

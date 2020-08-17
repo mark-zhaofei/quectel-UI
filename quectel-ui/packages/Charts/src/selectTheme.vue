@@ -21,7 +21,7 @@
 <script>
 import Theme from './theme'
 export default {
-  name: 'selectTheme',
+  name: 'QSelectTheme',
   props: {
     value: {
       type: String,

@@ -2,9 +2,9 @@ import Vue from 'vue'
 import Cookies from 'js-cookie'
 import i18n from '../i18n'
 import '../assets/styles/element.scss'
-import { GET, GETURL, POST, POSTURL, PUT, DELETE, ALL, PUTURL } from '@/api'
+// import { GET, GETURL, POST, POSTURL, PUT, DELETE, ALL, PUTURL } from '@/api'
 
-Vue.prototype.HTTP = { GET, GETURL, POST, POSTURL, PUT, DELETE, ALL, PUTURL }
+// Vue.prototype.HTTP = { GET, GETURL, POST, POSTURL, PUT, DELETE, ALL, PUTURL }
 import {
   Scrollbar,
   Pagination,

@@ -10,7 +10,7 @@ require('echarts/theme/macarons') // echarts theme
 const animationDuration = 6000
 
 export default {
-  name: 'BarChart', 
+  name: 'QBarChart', 
   mixins: [resize],
   props: {
     className: {

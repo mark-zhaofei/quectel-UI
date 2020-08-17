@@ -1,18 +1,16 @@
 <template>
   <div class="padding10 container">
-    <form-template :inner-obj='innerObj'
+    <q-form-template :inner-obj='innerObj'
                     height='600px'
                     @add='add'
                     @topBtnClick="topBtnClick">
-    </form-template>
+    </q-form-template>
   </div>
 </template>
 
 <script>
-// import { FormTemplate } from 'components'
 export default {
   name: 'tableView',
-  // components: { FormTemplate },
   data() {
     return {
       innerObj: { // 表格需要的参数

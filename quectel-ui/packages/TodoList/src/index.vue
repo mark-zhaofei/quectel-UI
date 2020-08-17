@@ -23,7 +23,7 @@
 import Todo from './Todo.vue'
 
 export default {
-  name: 'TodoList',
+  name: 'QTodoList',
   components: { Todo },
   props: {
     title: {

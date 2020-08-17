@@ -58,7 +58,7 @@
  * tree选择器
 */
 export default {
-  name: 'SelectTree',
+  name: 'QSelectTree',
   props: {
     title: {
       type: String,

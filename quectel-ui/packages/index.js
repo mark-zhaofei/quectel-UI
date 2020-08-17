@@ -1,44 +1,46 @@
-import QBarChart from './BarChart/index.js'
-import QBreadcrumb from './Breadcrumb/index.js'
-import QCalendar from './Calendar/index.js'
-import QCalendarItem from './CalendarItem/index.js'
-import QCharts from './Charts/index.js'
-import QCountTo from './CountTo/index.js'
-import QCropper from './Cropper/index.js'
-import QFormDialog from './FormDialog/index.js'
-import QFormTemplate from './FormTemplate/index.js'
-import QHeaderSearch from './HeaderSearch/index.js'
-import QIndexTabs from './IndexTabs/index.js'
-import QInputTree from './InputTree/index.js'
-import QNoData from './NoData/index.js'
-import QSelectTree from './SelectTree/index.js'
-import QSteps from './Steps/index.js'
-import QTips from './Tips/index.js'
-import QTodoList from './TodoList/index.js'
-import QTreeList from './TreeList/index.js'
-import QUpload from './Upload/index.js'
+import BarChart from './BarChart/index.js'
+import Breadcrumb from './Breadcrumb/index.js'
+import Calendar from './Calendar/index.js'
+import CalendarItem from './CalendarItem/index.js'
+import Charts from './Charts/index.js'
+import CountTo from './CountTo/index.js'
+import Cropper from './Cropper/index.js'
+import EditView from './EditView/index.js'
+import FormDialog from './FormDialog/index.js'
+import FormTemplate from './FormTemplate/index.js'
+import HeaderSearch from './HeaderSearch/index.js'
+import IndexTabs from './IndexTabs/index.js'
+import InputTree from './InputTree/index.js'
+import NoData from './NoData/index.js'
+import SelectTree from './SelectTree/index.js'
+import Steps from './Steps/index.js'
+import Tips from './Tips/index.js'
+import TodoList from './TodoList/index.js'
+import TreeList from './TreeList/index.js'
+import Upload from './Upload/index.js'
 
 
 const components = [
-  QBarChart,
-  QBreadcrumb,
-  QCalendar,
-  QCalendarItem,
-  QCharts,
-  QCountTo,
-  QCropper,
-  QFormDialog,
-  QFormTemplate,
-  QHeaderSearch,
-  QIndexTabs,
-  QInputTree,
-  QNoData,
-  QSelectTree,
-  QSteps,
-  QTips,
-  QTodoList,
-  QTreeList,
-  QUpload,
+  BarChart,
+  Breadcrumb,
+  Calendar,
+  CalendarItem,
+  Charts,
+  CountTo,
+  Cropper,
+  EditView,
+  FormDialog,
+  FormTemplate,
+  HeaderSearch,
+  IndexTabs,
+  InputTree,
+  NoData,
+  SelectTree,
+  Steps,
+  Tips,
+  TodoList,
+  TreeList,
+  Upload,
 ]
 
 const install = function(Vue, opts = {}) {
@@ -64,23 +66,24 @@ if (typeof window !== 'undefined' && window.Vue) {
 export default {
   version: '2.13.2',
   install,
-  QBarChart,
-  QBreadcrumb,
-  QCalendar,
-  QCalendarItem,
-  QCharts,
-  QCountTo,
-  QCropper,
-  QFormDialog,
-  QFormTemplate,
-  QHeaderSearch,
-  QIndexTabs,
-  QInputTree,
-  QNoData,
-  QSelectTree,
-  QSteps,
-  QTips,
-  QTodoList,
-  QTreeList,
-  QUpload
+  BarChart,
+  Breadcrumb,
+  Calendar,
+  CalendarItem,
+  Charts,
+  CountTo,
+  Cropper,
+  EditView,
+  FormDialog,
+  FormTemplate,
+  HeaderSearch,
+  IndexTabs,
+  InputTree,
+  NoData,
+  SelectTree,
+  Steps,
+  Tips,
+  TodoList,
+  TreeList,
+  Upload,
 }

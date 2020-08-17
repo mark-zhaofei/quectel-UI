@@ -16,7 +16,7 @@ import Theme from './theme'
 import SelectTheme from './selectTheme'
 
 export default {
-  name: 'Charts', 
+  name: 'QCharts', 
   mixins: [resize],
   components: { SelectTheme },
   props: {

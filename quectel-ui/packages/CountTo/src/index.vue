@@ -8,7 +8,7 @@
 <script>
 import countTo from 'vue-count-to'
 export default {
-  name: 'CountTo',
+  name: 'QCountTo',
   props: {
     value: {
       type: Number,

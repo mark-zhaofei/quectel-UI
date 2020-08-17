@@ -53,7 +53,7 @@
 </template>
 <script>
 export default {
-  name: 'TreeList',
+  name: 'QTreeList',
   components: {
     treeRender: {
       functional: true,

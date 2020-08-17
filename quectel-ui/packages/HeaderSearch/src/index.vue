@@ -23,7 +23,7 @@ import Fuse from 'fuse.js'
 import path from 'path'
 
 export default {
-  name: 'HeaderSearch',
+  name: 'QHeaderSearch',
   data() {
     return {
       search: '',

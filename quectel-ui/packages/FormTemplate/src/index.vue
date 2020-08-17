@@ -441,7 +441,7 @@
 // import ellipsisView from '../ellipsisView'
 // import { InputTree } from 'components'
 export default {
-  name: 'FormTemplate',
+  name: 'QFormTemplate',
   props: {
     innerObj: {
       type: Object,

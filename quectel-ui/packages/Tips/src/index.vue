@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: 'Tips',
+  name: 'QTips',
   props: {
     icon: {
       type: String,

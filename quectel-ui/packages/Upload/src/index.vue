@@ -41,7 +41,7 @@
 <script>
 import { getToken } from 'utils/auth'
 export default {
-  name: 'Upload',
+  name: 'QUpload',
   props: {
     disabled: {
       type: Boolean,

@@ -34,7 +34,7 @@
 
 <script>
 export default {
-  name: 'Steps',
+  name: 'QSteps',
   data() {
     return{}
   },

@@ -1,3 +1,6 @@
+import Affix from './Affix/index.js'
+import Anchor from './Anchor/index.js'
+import AnchorLink from './AnchorLink/index.js'
 import BarChart from './BarChart/index.js'
 import Breadcrumb from './Breadcrumb/index.js'
 import Calendar from './Calendar/index.js'
@@ -18,6 +21,12 @@ import Tips from './Tips/index.js'
 import TodoList from './TodoList/index.js'
 import TreeList from './TreeList/index.js'
 import Upload from './Upload/index.js'
+import split from './split/index.js'
+import Time from './Time/index.js'
+import TagsList from './TagsList/index.js'
+import SelectLazy from './SelectLazy/index.js'
+import HighSearch from './HighSearch/index.js'
+import Switch from './Switch/index.js'
 
 
 const components = [
@@ -41,6 +50,15 @@ const components = [
   TodoList,
   TreeList,
   Upload,
+  Affix,
+  Anchor,
+  AnchorLink,
+  split,
+  Time,
+  TagsList,
+  SelectLazy,
+  HighSearch,
+  Switch
 ]
 
 const install = function(Vue, opts = {}) {
@@ -86,4 +104,13 @@ export default {
   TodoList,
   TreeList,
   Upload,
+  Affix,
+  Anchor,
+  AnchorLink,
+  split,
+  Time,
+  TagsList,
+  SelectLazy,
+  HighSearch,
+  Switch
 }

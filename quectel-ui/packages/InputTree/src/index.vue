@@ -70,7 +70,7 @@ export default {
     nodeClick(data, node, self) {
       this.inputName = data[this.option.defaultProps.label]
       this.treeForm[this.option.inputVal] = data.id
-      this.$emit('change', data, node, self)
+      this.$emit('change', data, node, self, this.treeForm)
       this.$refs.inputTreeDrop.hide()
     },
     clear() {

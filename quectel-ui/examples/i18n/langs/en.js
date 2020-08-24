@@ -36,7 +36,17 @@ const en = {
     goodAfternoon: 'Good Afternoon',
     goodEvening: 'Good Evening',
     enterKeyWordsToFilter: 'Please Enter Key Words To Filter',
-    draggableTips: 'Drag and drop to sort'
+    draggableTips: 'Drag and drop to sort',
+    highFilter: 'High Filter',
+    clear: 'Clear',
+    reset: 'Reset',
+    filterKey: 'Filter Key',
+    equal: 'Equal',
+    notEqual: 'Not Equal',
+    include: 'Include',
+    notInclude: 'Not Include',
+    filterCondition: '筛选条件',
+    highSearchCondition: 'Please improve the conditions.',
   },
   ...enLocale
 }

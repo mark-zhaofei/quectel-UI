@@ -1,176 +1,199 @@
 <template>
   <div class="form-template-view">
     <slot name="header"></slot>
-    <div class="search-header clear">
-      <div class="left">
-        <el-button v-if="innerObj.add"
-                   type="primary"
-                   size="mini"
-                   icon="el-icon-plus"
-                   @click="add">{{$t('message.add') + innerObj.pageTitle}}</el-button>
-      <div v-else-if="innerObj.pageTitle" class="pageTitle">
-        <i class="iconfont iconshuxian color-primary"></i>
+    <div class="search-header">
+      <div v-if="innerObj.pageTitle" class="pageTitle">
+        <i class="iconfont iconshouye_shugang_shijiantixing color-primary"></i>
         <span>{{innerObj.pageTitle}}</span>
       </div>
-      <span v-for="(item, index) in innerObj.buttonList" :key="index">
-        <el-button :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)">{{item.label}}</el-button>
-      </span>
-      </div>
-      <div class="right">
-        <slot name="top"></slot>
-        <div v-for="(item, index) in formList"
-             :key="index">
-          <!--
-          输入框
-          bind: 绑定值   --必填
-          formType：input  --必填
-          尺寸： size
-          类型：type
-          输入框头部图标 prefixIcon
-          输入框尾部图标 suffixIcon
-        -->
-          <div v-if="item.formType === 'input'">
-            <el-input v-model="originalWatch[item.bind]"
-                      :size="item.size || 'mini'"
-                      :type="item.type || 'text'"
-                      :prefix-icon="item.prefixIcon"
-                      :suffix-icon="item.suffixIcon"
-                      :clearable="item.clearable"
-                      @clear="clear"
-                      :placeholder="item.placeholder || $t('message.pleaseEnter')"
-                      @keyup.enter.native="searchData">
-            </el-input>
-          </div>
-          <!-- 下拉框树，筛选带有层级结构的数据
-              tree: {
-                inputVal: 'deptId', 字段绑定值value
-                trees: [],
-                defaultProps: {
-                  children: 'children',
-                  label: 'name'
-                }
-              }
-              treeForm: 原始参数
-          -->
-          <div v-if="item.formType === 'inputTree'">
-            <input-tree :option="item.options"
-                        :treeForm="originalWatch[item.bind]"
-                        :placeholder="item.placeholder || $t('message.pleaseChoose')"
-                        :clearable="item.clearable"
-                        @change="searchData">
-            </input-tree>
-          </div>
-          <!--
-          输入框
-          bind: 绑定值   --必填
-          formType：date --必填
-          显示类型： type  // 可选 year/month/date/week/ datetime/datetimerange/daterange
-          范围选择时开始日期的占位内容 startPlaceholder
-          范围选择时结束日期的占位内容 endPlaceholder
-          是否使用箭头进行时间选择  timeArrowControl
-          显示在输入框中的格式  format  // yyyy-MM-dd HH:mm:ss
-          绑定值的格式。 valueFormat
-          是否显示清除按钮  clearable
-          禁用  disabled
-          只读  readonly
-        -->
-          <div v-if="item.formType === 'date'">
-            <el-date-picker
-              v-model="originalWatch[item.bind]"
-              :size="item.size || 'mini'"
-              :type="item.type || 'datetimerange'"
-              :picker-options="item.pickerOptions || {}"
-              :time-arrow-control="item.timeArrowControl || false"
-              :format="item.format || 'yyyy-MM-dd HH:mm:ss'"
-              :value-format="item.valueFormat || 'yyyy-MM-dd HH:mm:ss'"
-              :clearable="item.clearable || true"
-              :disabled="item.disabled || false"
-              :readonly="item.readonly || false"
-              range-separator="-"
-              :start-placeholder="item.startPlaceholder || $t('message.StartDate')"
-              :end-placeholder="item.endPlaceholder || $t('message.EndDate')">
-            </el-date-picker>
-          </div>
-          <!--
-          选择框
-          -------------必填--------
-          formType：select
-          bind: 绑定值
-          options: 数据源
-
-          ------------可选----------
-          尺寸： size
-          多选 multiple
-          多选时最多限制 multipleLimit  0不限制
-          筛选 filterable
-          清空 clearable
-        -->
-          <div v-if="item.formType === 'select'">
-            <el-select v-model="originalWatch[item.bind]"
-                       :size="item.size || 'mini'"
-                       :placeholder="item.placeholder || $t('message.pleaseChoose')"
-                       :multiple="item.multiple || false"
-                       :filterable="item.filterable || false"
-                       :clearable="item.clearable || false"
-                       :multiple-limit="item.multipleLimit || 0">
-              <el-option v-for="item in item.options"
-                         :key="item.value"
-                         :label="item.label"
-                         :value="item.value">
-              </el-option>
-            </el-select>
-          </div>
-          <!--
-            级联选择器
-            -------------必填--------
-            formType：cascader --必填
+      <div :style="{display: 'flex',flex: 1,'flex-direction': innerObj.buttonAlign === 'right' ? 'row-reverse' : 'row'}">
+        <!-- 按钮列 -->
+        <div class="left" :style="{'justify-content': innerObj.buttonAlign === 'right' ? 'flex-end' : 'flex-start'}">
+          <span v-if="innerObj.add">
+            <el-button
+                    type="primary"
+                    size="mini"
+                    icon="el-icon-plus"
+                    @click="add">{{$t('message.add') + (innerObj.addTitle || innerObj.pageTitle || '')}}</el-button>
+          </span> 
+          <span v-for="(item, index) in innerObj.buttonList" :key="index">
+            <el-dropdown v-if="item.dropdown && !item.hidden" :trigger="item.trigger || 'hover'" placement='bottom' :hide-on-click='false'>
+              <el-button :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)">
+                {{item.label}}
+                <i v-if='item.icon' class="el-icon-arrow-down el-icon--right"></i>
+              </el-button>
+              <el-dropdown-menu slot="dropdown" v-if="item.options && item.options.length">
+                <el-dropdown-item v-for="(child, cIndex) in item.options" :key="cIndex">
+                  <span @click="topBtnClick(child.func, child)">{{child.label}}</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <el-button v-else-if="!item.hidden" :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)">{{item.label}}</el-button>
+          </span>
+        </div>
+        <!-- 搜索列 -->
+        <div class="right" :style="{'justify-content': innerObj.buttonAlign === 'right' ? 'flex-start' : 'flex-end'}">
+          <slot name="top"></slot>
+          <div v-for="(item, index) in formList"
+              :key="index">
+            <!--
+            输入框
             bind: 绑定值   --必填
-            options: 数据源  --必填
+            formType：input  --必填
+            尺寸： size
+            类型：type
+            输入框头部图标 prefixIcon
+            输入框尾部图标 suffixIcon
+          -->
+            <div v-if="item.formType === 'input'">
+              <el-input v-model="originalWatch[item.bind]"
+                        :size="item.size || 'mini'"
+                        :type="item.type || 'text'"
+                        :prefix-icon="item.prefixIcon"
+                        :suffix-icon="item.suffixIcon"
+                        :clearable="item.clearable"
+                        @clear="clear"
+                        :placeholder="item.placeholder || $t('message.pleaseEnter')"
+                        @keyup.enter.native="searchData">
+              </el-input>
+            </div>
+            <!-- 下拉框树，筛选带有层级结构的数据
+                tree: {
+                  inputVal: 'deptId', 字段绑定值value
+                  trees: [],
+                  defaultProps: {
+                    children: 'children',
+                    label: 'name'
+                  }
+                }
+                treeForm: 原始参数
+            -->
+            <div v-if="item.formType === 'inputTree'">
+              <input-tree :option="item.options"
+                          :treeForm="originalWatch[item.bind]"
+                          :placeholder="item.placeholder || $t('message.pleaseChoose')"
+                          :clearable="item.clearable"
+                          @change="searchData">
+              </input-tree>
+            </div>
+            <!--
+            输入框
+            bind: 绑定值   --必填
+            formType：date --必填
+            显示类型： type  // 可选 year/month/date/week/ datetime/datetimerange/daterange
+            范围选择时开始日期的占位内容 startPlaceholder
+            范围选择时结束日期的占位内容 endPlaceholder
+            是否使用箭头进行时间选择  timeArrowControl
+            显示在输入框中的格式  format  // yyyy-MM-dd HH:mm:ss
+            绑定值的格式。 valueFormat
+            是否显示清除按钮  clearable
+            禁用  disabled
+            只读  readonly
+          -->
+            <div v-if="item.formType === 'date'">
+              <el-date-picker
+                v-model="originalWatch[item.bind]"
+                :size="item.size || 'mini'"
+                :type="item.type || 'datetimerange'"
+                :picker-options="item.pickerOptions || {}"
+                :time-arrow-control="item.timeArrowControl || false"
+                :format="item.format || 'yyyy-MM-dd HH:mm:ss'"
+                :value-format="item.valueFormat || 'yyyy-MM-dd HH:mm:ss'"
+                :clearable="item.clearable || true"
+                :disabled="item.disabled || false"
+                :readonly="item.readonly || false"
+                range-separator="-"
+                :start-placeholder="item.startPlaceholder || $t('message.StartDate')"
+                :end-placeholder="item.endPlaceholder || $t('message.EndDate')">
+              </el-date-picker>
+            </div>
+            <!--
+            选择框
+            -------------必填--------
+            formType：select
+            bind: 绑定值
+            options: 数据源
 
             ------------可选----------
             尺寸： size
             多选 multiple
+            多选时最多限制 multipleLimit  0不限制
+            筛选 filterable
             清空 clearable
-            是否显示选中值的完整路径 showAllLevels
-            是否严格的遵守父子节点不互相关联 checkStrictly
-            emitPath 在选中节点改变时，是否返回由该节点所在的各级菜单的值所组成的数组，若设置 false，则只返回该节点的值
           -->
-          <div v-if="item.formType === 'cascader'">
-            <el-cascader v-model="originalWatch[item.bind]"
-                         :size="item.size || 'mini'"
-                         :options="item.options"
-                         :clearable="item.clearable || false"
-                         :show-all-levels="item.showAllLevels || false"
-                         :placeholder="item.placeholder || $t('message.pleaseEnter')"
-                         :props="{
-                        expandTrigger: item.expandTrigger || 'click',
-                        multiple: item.multiple || false,
-                        checkStrictly: item.checkStrictly || false,
-                        emitPath: item.emitPath || false,
-                        value: item.valueKey || 'value',
-                        label: item.labelKey || 'label'
-                      }">
-            </el-cascader>
-          </div>
-        </div>
-        <div v-if="formList && formList.length">
-          <el-button type="primary"
-                     size="mini"
-                     @click="searchData">{{$t('message.search')}}</el-button>
-        </div>
-        <!-- 显示隐藏表格列 -->
-        <el-popover
-          v-if="innerObj.tableData.options.editDataHead"
-          placement="bottom"
-          trigger="click">
-          <div class="selfDefine">
-            <div class="selfDefineItem" v-for="(item, index) in innerObj.tableData.dataHead" :key="index">
-              <el-checkbox :checked="!item.hidden" @change="(val)=>{return checkboxClick(index,val)}">{{item.label}}</el-checkbox>
+            <div v-if="item.formType === 'select'">
+              <el-select v-model="originalWatch[item.bind]"
+                        :size="item.size || 'mini'"
+                        :placeholder="item.placeholder || $t('message.pleaseChoose')"
+                        :multiple="item.multiple || false"
+                        :filterable="item.filterable || false"
+                        :clearable="item.clearable || false"
+                        :multiple-limit="item.multipleLimit || 0">
+                <el-option v-for="item in item.options"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <!--
+              级联选择器
+              -------------必填--------
+              formType：cascader --必填
+              bind: 绑定值   --必填
+              options: 数据源  --必填
+
+              ------------可选----------
+              尺寸： size
+              多选 multiple
+              清空 clearable
+              是否显示选中值的完整路径 showAllLevels
+              是否严格的遵守父子节点不互相关联 checkStrictly
+              emitPath 在选中节点改变时，是否返回由该节点所在的各级菜单的值所组成的数组，若设置 false，则只返回该节点的值
+            -->
+            <div v-if="item.formType === 'cascader'">
+              <el-cascader v-model="originalWatch[item.bind]"
+                          :size="item.size || 'mini'"
+                          :options="item.options"
+                          :clearable="item.clearable || false"
+                          :show-all-levels="item.showAllLevels || false"
+                          :placeholder="item.placeholder || $t('message.pleaseEnter')"
+                          :props="{
+                          expandTrigger: item.expandTrigger || 'click',
+                          multiple: item.multiple || false,
+                          checkStrictly: item.checkStrictly || false,
+                          emitPath: item.emitPath || false,
+                          value: item.valueKey || 'value',
+                          label: item.labelKey || 'label'
+                        }">
+              </el-cascader>
             </div>
           </div>
-          <el-button slot="reference" size="mini">{{$t('message.selfDefine')}}</el-button>
-        </el-popover>
+          <div v-if="formList && formList.length">
+            <el-button type="primary"
+                      size="mini"
+                      @click="searchData">{{$t('message.search')}}</el-button>
+          </div>
+          <span v-if="innerObj.highFilter">
+            <!-- 高级筛选 -->
+            <el-button :type="innerObj.highFilterType || 'success'" :changeStyle="innerObj.highFilterStyle" size="mini" @click='highFilterClick'>{{$t('message.highFilter')}}</el-button>
+            <!-- 清空高级筛选 -->
+            <el-button size="mini" @click="resetHigh">{{$t('message.clear') + $t('message.highFilter')}}</el-button>
+          </span>
+        </div>
       </div>
+      <!-- 显示隐藏表格列 -->
+      <el-popover
+        v-if="innerObj.tableData.options && innerObj.tableData.options.editDataHead"
+        placement="bottom"
+        trigger="click">
+        <div class="selfDefine">
+          <div class="selfDefineItem" v-for="(item, index) in innerObj.tableData.dataHead" :key="index">
+            <el-checkbox :checked="!item.hidden" @change="(val)=>{return checkboxClick(index,val)}">{{item.label}}</el-checkbox>
+          </div>
+        </div>
+        <el-button slot="reference" class="popoverButton" size="mini">{{$t('message.selfDefine')}}</el-button>
+      </el-popover>
     </div>
     <slot name="top-after"></slot>
     <div class="search-content"
@@ -310,7 +333,7 @@
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
             <template slot-scope="scope">
-              <el-tag type="success"
+              <el-tag :type="v.type || 'success'"
                       :size="v.size || 'mini'" :effect="v.effect || 'light'" :hit="v.hit || false">{{scope.row[v.prop] | noString}}</el-tag>
             </template>
           </el-table-column>
@@ -433,6 +456,7 @@
                      @size-change="handleSizeChange"
                      background></el-pagination>
     </div>
+    <q-high-search ref="high" :visible='highVisible' :highList='innerObj.highList' @close='highClose' @save='highSave'></q-high-search>
     <slot name="dialogs"></slot>
   </div>
 </template>
@@ -459,17 +483,51 @@ export default {
   },
   data() {
     return {
+      highVisible: false,
       dataBodyObj: {},
       headerStyle: { // 表头样式
-        // background: '#edf0f3 !important',
-        // 'border-left': '1px solid red',
-        // color: '#333333'
+        background: '#f8f9fb !important',
+        color: '#333333'
       },
       loading: false,
       originalWatch: this.innerObj.originalWatch // 需被检测刷新数据
     }
   },
   methods: {
+    /**
+     * 清空高级筛选
+    */
+   resetHigh() {
+     this.$refs.high.reset()
+   },
+    /**
+     * 点击高级搜索
+    */
+   highFilterClick() {
+     this.highVisible = true
+   },
+   /**
+    * 高级筛选取消
+   */
+  highClose(value) {
+    this.innerObj.originalWatch = {
+      ...this.originalWatch,
+      ...value
+    }
+    this.$emit('searchData')
+    this.highVisible = false
+  },
+  /**
+   * 高级筛选保存
+  */
+  highSave(value) {
+    this.innerObj.originalWatch = {
+      ...this.originalWatch,
+      ...value
+    }
+    this.$emit('searchData')
+        this.highVisible = false
+  },
     /**
      * 拖动表头
     */
@@ -523,14 +581,16 @@ export default {
     /**
      *  用于多选表格，切换某一行的选中状态，
     */
-    toggleRowSelection(arr) {
+    toggleRowSelection(arr, selected = null) {
       const tableData = this.innerObj.tableData
       arr.forEach(element => {
         if (this.dataBodyObj[element[tableData.options.rowKey || 'id']]) {
-          this.$refs[this.innerObj.tableData.options.ref || 'table'].toggleRowSelection(this.dataBodyObj[element[tableData.options.rowKey || 'id']])
+          this.$refs[this.innerObj.tableData.options.ref || 'table'].toggleRowSelection(this.dataBodyObj[element[tableData.options.rowKey || 'id']], selected)
         }
       })
     },
+
+
     /**
      * 重新布局
      */
@@ -689,16 +749,27 @@ export default {
   }
   .search-header {
     @include flex-nowrap;
+    justify-content:  space-between;
     .pageTitle{
+      align-self: flex-start;
       @include fj(center);
       padding-top: 6px;
+      padding-right: 10px;
+      max-width: 100px;
+      line-height: 14px;
       span{
         font-size: 14px;
         font-weight: 550;
       }
     }
+    .popoverButton{
+      display: flex;
+      align-self: flex-end;
+      margin-left: 10px;
+    }
     .left {
       flex: 1;
+      @include flex-wrap;
       > * {
         margin: 0 0 10px 10px;
         float: left;
@@ -708,7 +779,7 @@ export default {
     .right {
       flex: 2;
       @include flex-wrap;
-      justify-content: flex-end;
+      // justify-content: flex-end;
       flex-direction: row;
       .el-input {
         width: 160px;

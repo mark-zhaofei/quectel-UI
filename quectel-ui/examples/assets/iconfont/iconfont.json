@@ -6,6 +6,55 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "1316944",
+      "name": "首页_竖杠_时间提醒",
+      "font_class": "shouye_shugang_shijiantixing",
+      "unicode": "e62a",
+      "unicode_decimal": 58922
+    },
+    {
+      "icon_id": "643797",
+      "name": "个人",
+      "font_class": "21",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "774383",
+      "name": "用户1",
+      "font_class": "yonghu1",
+      "unicode": "e61f",
+      "unicode_decimal": 58911
+    },
+    {
+      "icon_id": "868561",
+      "name": "icon-用户",
+      "font_class": "iconyonghu",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
+      "icon_id": "3550640",
+      "name": "管理者",
+      "font_class": "nav_user",
+      "unicode": "e66c",
+      "unicode_decimal": 58988
+    },
+    {
+      "icon_id": "7338642",
+      "name": "个人",
+      "font_class": "geren",
+      "unicode": "e6ae",
+      "unicode_decimal": 59054
+    },
+    {
+      "icon_id": "7900764",
+      "name": "管理员",
+      "font_class": "guanliyuan",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
       "icon_id": "1008272",
       "name": "关闭",
       "font_class": "iconddgb",

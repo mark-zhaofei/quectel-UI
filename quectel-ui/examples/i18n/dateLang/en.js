@@ -10,7 +10,14 @@ const en = {
     Thursday: 'Thursday',
     Friday: 'Friday',
     Saturday: 'Saturday',
-    Sunday: 'Sunday'
+    Sunday: 'Sunday',
+    before: ' ago',
+    after: ' after',
+    just: 'just now',
+    seconds: ' seconds',
+    minutes: ' minutes',
+    hours: ' hours',
+    days: ' days'
   },
   ...enLocale
 }

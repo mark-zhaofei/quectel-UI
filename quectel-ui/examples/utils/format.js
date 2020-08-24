@@ -101,10 +101,22 @@ const getDateYMD = (today) => {
   return day
 }
 
+const timeFormat = (time) => {
+  if (!time) return ''
+  const YYYY = time.getFullYear()
+  const MM = time.getMonth() + 1
+  const MM1 = MM > 9 ? MM : '0' + MM
+  const DD = time.getDate()
+  const DD1 = DD > 9 ? DD : '0' + DD
+  time = YYYY + '-' + MM1 + '-' + DD1
+  return time
+}
+
 export default {
   getWeekDate,
   getPrevNextDate,
   getPreMonth,
   getNextMonth,
-  getDateYMD
+  getDateYMD,
+  timeFormat
 }

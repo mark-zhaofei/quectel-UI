@@ -3,6 +3,11 @@ const path = require('path')
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
+
+// "dist:locale": "webpack --config build/webpack.dist.locale.config.js",
+// "dist": "npm run lib && npm run dist:locale",
+// "prepare": "npm run dist"
+
 module.exports = {
   // 修改 src 目录 为 examples 目录
   pages: {
@@ -33,6 +38,7 @@ module.exports = {
       .rule('js')
       .include
         .add(__dirname + 'packages')  // 注意这里需要绝对路径，所有要拼接__dirname
+        .add(__dirname + 'examples')  // 注意这里需要绝对路径，所有要拼接__dirname
         .end()
       .use('babel')
         .loader('babel-loader')

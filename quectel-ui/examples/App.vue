@@ -1,159 +1,50 @@
+
 <template>
-  <div class="padding10 container">
-    <q-form-template :inner-obj='innerObj'
-                    height='600px'
-                    @add='add'
-                    @topBtnClick="topBtnClick">
-    </q-form-template>
-  </div>
+    <div class="container">
+        <ul class="ul">
+            <li><router-link tag='span' to="/affix">Affix 吸顶组件</router-link></li>
+            <li><router-link tag='span' to="/anchor">Anchor 锚点组件</router-link></li>
+            <li><router-link tag='span' to="/split">Split 伸缩框组件</router-link></li>
+            <li><router-link tag='span' to="/time">Time 时间组件</router-link></li>
+            <li><router-link tag='span' to="/table">Table 表格组件</router-link></li>
+            <li><router-link tag='span' to="/tabs">Tabs 标签页组件</router-link></li>
+            <li><router-link tag='span' to="/dialog">Dialog 弹框组件</router-link></li>
+            <li><router-link tag="span" to='/switch'>Switch 开关组件</router-link></li>
+        </ul>
+        <router-view></router-view>
+    </div>
 </template>
-
 <script>
-export default {
-  name: 'tableView',
-  data() {
-    return {
-      innerObj: { // 表格需要的参数
-        add: true,
-        pageTitle: '',
-        buttonList: [
-          { type: 'primary', label: '其他按钮', func: '1' },
-          { type: 'primary', label: '其他按钮', func: '1' },
-          { type: 'danger', label: '带icon', icon: 'el-icon-grape', func: '2' }
-        ],
-        formList: [
-          {
-            formType: 'input',
-            bind: 'key',
-            type: 'text',
-            clearable: true,
-            prefixIcon: 'el-icon-search'
-          }, {
-            formType: 'select',
-            bind: 'select',
-            options: [{ label: 1, value: 1 }, { label: 2, value: 2 }]
-          }, {
-            formType: 'date',
-            bind: 'date'
-          }, {
-            formType: 'cascader',
-            bind: 'cascader',
-            options: [
-              { label: 1, value: 1, children: [{ label: 2, value: 2 }] },
-              { label: 2, value: 2 }
-            ]
-          }
-        ],
-        tableData: {
-          options: {
-            indexType: 'selection',
-            ref: 'userTable',
-            page: true,
-            editDataHead: true
-          },
-          dataBody: [{
-            id: '1',
-            name: '张三',
-            img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
-            rate: 1,
-            switch: 'N'
-          }, {
-            id: 2,
-            name: '123',
-            img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
-            rate: 2,
-            switch: 'Y'
-          }, {
-            id: 3,
-            name: '123',
-            img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
-            rate: 2,
-            switch: 'Y'
-          }, {
-            id: 4,
-            name: '123',
-            img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
-            rate: 2,
-            switch: 'Y'
-          }, {
-            id: 5,
-            name: '123',
-            img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
-            rate: 2,
-            switch: 'Y'
-          }, {
-            id: 6,
-            name: '123',
-            img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
-            rate: 2,
-            switch: 'Y'
-          }, {
-            id: 7,
-            name: '123',
-            img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
-            rate: 2,
-            switch: 'Y'
-          }],
-          dataHead: [
-            { prop: 'name', label: '123' },
-            { prop: 'img', label: '123', img: true },
-            { prop: 'name', label: '123', input: true },
-            { prop: 'name', label: '123', select: true, width: 190, options: [
-              { label: 1, value: 1 },
-              { label: 2, value: 2 },
-              { label: 3, value: 3 }
-            ] },
-            { prop: 'name', label: '123', tag: true },
-            { prop: 'rate', label: '123', rate: true, width: 100 },
-            { prop: 'name', label: '123', link: true },
-            { prop: 'name', label: '双击事件' },
-            { prop: 'name', label: '123', sortable: 'custom' },
-            { prop: 'switch', label: '123', switch: true, activeValue: 'Y', inactiveValue: 'N' },
-            { label: '嵌套表头', columns: [
-              { prop: 'name', label: '123' },
-              { prop: 'name', label: '123' }
-            ] }
-          ]
-        },
-        originalWatch: {
-          pageNumber: 1,
-          pageSize: 10,
-          key: '',
-          select: '',
-          date: '',
-          orderBy: '',
-          orderDirection: '',
-          workStatus: 'IN_SERVICE'
-        },
-        totalCount: 0
-      }
-    }
-  },
-  methods: {
-    init() {},
-    add() {
-      this.$message.success('您点击了新增按钮')
-    },
-    /**
-     * 其他按钮点击
-    */
-    topBtnClick(func, item) {
-      switch(func) {
-        case '1':
-          this.$message.success(`您点击了按钮【${item.label}】`)
-          break
-        case '2':
-          this.$message.success(`您点击了按钮【${item.label}】`)
-          break
-      }
-    }
-  }
-}
-</script>
+    module.exports = {
+        data: function() {
+            return {
 
-<style lang='scss' scoped>
-.container{
-  // background: red;
-  flex: 1;
+            }
+        },
+        mounted: function() {
+
+        },
+        beforeDestroy: function() {
+
+        },
+        methods: {
+
+        }
+    }
+</script>
+<style lang="scss" scoped>
+.ul{
+  padding: 20px;
+}
+li{
+  display: inline;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  margin: 0 10px;
+  border-right: 1px solid #000;
+  padding: 10px;
+  color: red;
+  cursor: pointer;
 }
 </style>

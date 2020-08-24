@@ -16,9 +16,13 @@
         :label="item.label"
         :name="item.name"
         class="scrollbar"
+        lazy
         :disabled='item.disabled'
       >
-        <inner-render :render="item.render"></inner-render>
+        <transition v-if="transition" name="slide-fade" mode="in-out">
+          <inner-render v-if="renderShow" :render="item.render"></inner-render>
+        </transition>
+        <inner-render v-else :render="item.render"></inner-render>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -28,6 +32,12 @@
 export default {
   name: 'QIndexTabs',
   props: {
+    transition: {
+      type: Boolean,
+      default: () => {
+        return false  
+      }
+    },
     innerList: {
       type: Array,
       required: true
@@ -56,11 +66,13 @@ export default {
   },
   data() {
     return {
-      activeName: ''
+      activeName: '',
+      renderShow: true
     }
   },
   mounted() {
-    this.activeName = this.$route.params.activeName || this.tabsList[0].name
+    console.log(this.$route.params.activeName,  this.tabsList[0].name)
+    this.activeName = this.$route.params.activeName ? this.$route.params.activeName : this.tabsList[0].name
   },
   methods: {
     /**
@@ -73,6 +85,10 @@ export default {
     * 标签点击
    */
     tabClick(item) {
+      this.renderShow = false
+      this.$nextTick(() => {
+        this.renderShow = true
+      })
       this.$emit('tabClick', item)
     },
     activeInit(el) {

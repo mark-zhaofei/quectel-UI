@@ -1,22 +1,53 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
   const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    name: 'About',
+    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/anchor',
+    name: 'anchor',
+    component: () => import(/* webpackChunkName: "about" */ '../views/anchor.vue')
+  },
+  {
+    path: '/affix',
+    name: 'affix',
+    component: () => import(/* webpackChunkName: "about" */ '../views/affix.vue')
+  },
+  {
+    path: '/split',
+    name: 'split',
+    component: () => import(/* webpackChunkName: "about" */ '../views/split.vue')
+  },
+  {
+    path: '/time',
+    name: 'time',
+    component: () => import(/* webpackChunkName: "about" */ '../views/time.vue')
+  },
+  {
+    path: '/table',
+    name: 'table',
+    component: () => import(/* webpackChunkName: "about" */ '../views/table.vue')
+  },
+  {
+    path: '/tabs',
+    name: 'tabs',
+    component: () => import(/* webpackChunkName: "about" */ '../views/tabs.vue')
+  },
+  {
+    path: '/dialog',
+    name: 'dialog',
+    component: () => import(/* webpackChunkName: "about" */ '../views/dialog.vue')
+  },
+  {
+    path: '/switch',
+    name: 'switch',
+    component: () => import(/* webpackChunkName: "about" */ '../views/switch.vue')
   }
 ]
 

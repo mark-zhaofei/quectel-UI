@@ -36,7 +36,18 @@ const cn = {
     goodAfternoon: '下午好',
     goodEvening: '晚上好',
     enterKeyWordsToFilter: '输入关键字进行过滤',
-    draggableTips: '可拖拽进行排序'
+    draggableTips: '可拖拽进行排序',
+    highFilter: '高级筛选',
+    clear: '清空',
+    reset: '重置',
+    filterKey: '筛选字段',
+    equal: '等于',
+    notEqual: '不等于',
+    include: '包含',
+    notInclude: '不包含',
+    filterCondition: '筛选条件',
+    highSearchCondition: '请完善条件',
+
   },
   ...zhLocale
 }

@@ -20,7 +20,7 @@
             <el-dropdown v-if="item.dropdown && !item.hidden" :trigger="item.trigger || 'hover'" placement='bottom' :hide-on-click='false'>
               <el-button :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)">
                 {{item.label}}
-                <i v-if='item.icon' class="el-icon-arrow-down el-icon--right"></i>
+                <i v-if='item.icon' :class="(item.icon && String(item.icon) !== 'true') ? 'item.icon' : 'el-icon-arrow-down el-icon--right'" ></i>
               </el-button>
               <el-dropdown-menu slot="dropdown" v-if="item.options && item.options.length">
                 <el-dropdown-item v-for="(child, cIndex) in item.options" :key="cIndex">
@@ -129,10 +129,10 @@
                         :filterable="item.filterable || false"
                         :clearable="item.clearable || false"
                         :multiple-limit="item.multipleLimit || 0">
-                <el-option v-for="item in item.options"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value">
+                <el-option v-for="select in item.options"
+                          :key="item.valueKey ? select[item.valueKey] : select.value"
+                          :label="item.labelKey ? select[item.labelKey] : select.label"
+                          :value="item.valueKey ? select[item.valueKey] : select.value">
                 </el-option>
               </el-select>
             </div>
@@ -164,7 +164,9 @@
                           checkStrictly: item.checkStrictly || false,
                           emitPath: item.emitPath || false,
                           value: item.valueKey || 'value',
-                          label: item.labelKey || 'label'
+                          label: item.labelKey || 'label',
+                          children: item.childrenKey || 'children',
+                          disabled: item.disabledKey || 'disabled'
                         }">
               </el-cascader>
             </div>
@@ -207,25 +209,29 @@
         option： 表格设置
        -->
       <el-table v-if="innerObj.tableData"
-                :ref="innerObj.tableData.options.ref || 'table'"
+                :ref="innerObj.tableData.options && innerObj.tableData.options.ref ? innerObj.tableData.options.ref : 'table'"
                 v-loading="loading"
                 element-loading-text="数据正在加载中"
                 :header-cell-style="headerStyle || {}"
+                :show-header='innerObj.tableData.options && innerObj.tableData.options.showHeader'
                 :data="innerObj.tableData.dataBody"
-                :border="innerObj.tableData.options.border || true"
-                :stripe="innerObj.tableData.options.stripe || true"
-                :height="innerObj.tableData.options.height || '100'"
-                :max-height="innerObj.tableData.options.maxHeight"
-                :width="innerObj.tableData.options.width"
-                :emptyText="innerObj.tableData.options.emptyText || '暂无数据'"
-                :default-sort="innerObj.tableData.options.defaultSort"
+                :border="innerObj.tableData.options && (innerObj.tableData.options.border || innerObj.tableData.options.mergeTable)"
+                :stripe="innerObj.tableData.options && innerObj.tableData.options.stripe ? innerObj.tableData.options.stripe : true"
+                :height="innerObj.tableData.options && innerObj.tableData.options.height ? innerObj.tableData.options.height : '100'"
+                :max-height="innerObj.tableData.options ? innerObj.tableData.options.maxHeight : null"
+                :width="innerObj.tableData.options ? innerObj.tableData.options.width : ''"
+                :emptyText="innerObj.tableData.options && innerObj.tableData.options.emptyText ? innerObj.tableData.options.emptyText : '暂无数据'"
+                :default-sort="innerObj.tableData.options && innerObj.tableData.options.defaultSort ? innerObj.tableData.options.defaultSort : {}"
                 highlight-current-row
-                :row-key="innerObj.tableData.options.rowKey || 'id'"
-                :tree-props="innerObj.tableData.options.treeProps"
+                :row-key="innerObj.tableData.options && innerObj.tableData.options.rowKey ? innerObj.tableData.options.rowKey : 'id'"
+                :tree-props="innerObj.tableData.options && innerObj.tableData.options.treeProps ? innerObj.tableData.options.treeProps : { hasChildren: 'hasChildren', children: 'children' }"
+                :span-method="innerObj.tableData.options && innerObj.tableData.options.mergeTable ? arraySpanMethod : null"
                 @selection-change="handleSelectionChange"
                 @sort-change="sortChange"
                 @header-dragend="headerDragend"
-                :default-expand-all="innerObj.tableData.options.expandAll || false"
+                :default-expand-all="innerObj.tableData.options && innerObj.tableData.options.expandAll ? innerObj.tableData.options.expandAll : false"
+                @cell-mouse-enter='cellMouseEnter'
+                @cell-mouse-leave='cellMouseLeave'
                 @cell-dblclick='dblclick'>
         <!--
           列循环
@@ -233,7 +239,7 @@
         <!-- 列样式调整 -->
         <!-- <el-table-column width="1" fixed="left" style="opacity: 0;"></el-table-column> -->
         <!-- 序号列 -->
-        <el-table-column v-if="innerObj.tableData.options.indexType"
+        <el-table-column v-if="innerObj.tableData.options && innerObj.tableData.options.indexType"
                          :type="innerObj.tableData.options.indexType || 'index'"
                          :label="innerObj.tableData.options.indexLabel || '序号'"
                          :align="innerObj.tableData.options.indexAlign || 'left'"
@@ -354,6 +360,7 @@
                          :inactive-text="v.inactiveText"
                          :active-value="v.activeValue"
                          :inactive-value="v.inactiveValue"
+                         :disabled="scope.row[v.disabledKey] || scope.row['disabled']"
                          @change="switchChange(scope.row, v.prop, scope.$index)">
               </el-switch>
             </template>
@@ -375,8 +382,74 @@
               <el-rate v-model="scope.row[v.prop]"
                        :colors="v.colors"
                        :show-text="v.showText || false"
-                       :disabled="scope.row.disabled || false"
+                       :disabled="scope.row[v.disabledKey] || scope.row['disabled']"
                        :allow-half="v.allowHalf || false"></el-rate>
+            </template>
+          </el-table-column>
+
+          <!--
+            单选组
+            -------------必填--------
+            formType：cascader --必填
+            bind: 绑定值   --必填
+            options: 数据源  --必填
+
+            ------------可选----------
+            禁用 disabled
+            是否显示边框 border
+          -->
+          <el-table-column v-else-if="v.radioGroup && !v.hidden"
+                           :label="v.label"
+                           :width="v.width"
+                           :fixed="v.fixed"
+                           :align="v.align || 'left'" :key="index">
+            <template slot-scope="scope">
+              <el-radio-group v-model="scope.row[v.prop]" 
+                            :disabled="scope.row[v.disabledKey] || scope.row['disabled']" 
+                            :size="v.size || 'mini'">
+              <span v-if="v.button">
+                <el-radio-button v-for="(radio, rIndex) in (v.options || scope.row[v.optionsKey])" 
+                                :key="rIndex" 
+                                :label="v.valueKey ? radio[v.valueKey] : radio.value" 
+                                :border='radio.border'>{{v.labelKey ? radio[v.labelKey] : radio.label}}</el-radio-button>
+              </span>
+              <span v-else>
+                <el-radio v-for="(radio, _index) in (v.options || scope.row[v.optionsKey])" 
+                          :key="_index" 
+                          :label="v.valueKey ? radio[v.valueKey] : radio.value" 
+                          :border='radio.border'>{{v.labelKey ? radio[v.labelKey] : radio.label}}</el-radio>
+              </span>
+            </el-radio-group>
+            </template>
+          </el-table-column>
+         
+
+          <!--
+            多选
+            -------------必填--------
+            formType：checkbox --必填
+            bind: 绑定值   --必填
+            options: 数据源  --必填
+
+            ------------可选----------
+            禁用 disabled
+            是否显示边框 border
+          -->
+          <el-table-column v-else-if="v.checkboxGroup"
+                           :label="v.label"
+                           :width="v.width"
+                           :fixed="v.fixed"
+                           :align="v.align || 'left'" :key="index">
+            <template slot-scope="scope">
+              <el-checkbox-group v-model="scope.row[v.prop]" 
+                                :disabled="scope.row[v.disabledKey] || scope.row['disabled']" 
+                                :border='v.border'>
+                <el-checkbox
+                v-for="(check, _index) in  (v.options || scope.row[v.optionsKey])" 
+                :key="_index" 
+                :label="v.valueKey ? check[v.valueKey] : check.value" 
+                :disabled="check.disabled">{{v.labelKey ? check[v.labelKey] : check.label}}</el-checkbox>
+              </el-checkbox-group>
             </template>
           </el-table-column>
 
@@ -393,6 +466,7 @@
                         :prefix-icon="v.prefixIcon"
                         :suffix-icon="v.suffixIcon"
                         :clearable="v.clearable"
+                        :disabled="scope.row[v.disabledKey] || scope.row['disabled']"
                         :placeholder="v.placeholder || $t('message.pleaseEnter')"></el-input>
             </template>
           </el-table-column>
@@ -410,6 +484,7 @@
                          :multiple="v.multiple || false"
                          :filterable="v.filterable || false"
                          :clearable="v.clearable || false"
+                         :disabled="scope.row[v.disabledKey] || scope.row['disabled']"
                          :multiple-limit="v.multipleLimit || 0">
                 <el-option v-for="item in v.options"
                            :key="item.value"
@@ -417,6 +492,26 @@
                            :value="item.value">
                 </el-option>
               </el-select>
+            </template>
+          </el-table-column>
+
+          <!-- 
+            popoverOption 弹出框
+
+            ----必填
+            content 弹出内容
+           -->
+          <el-table-column v-else-if="v.popoverOption && !v.hidden"
+                           :label="v.label"
+                           :width="v.width"
+                           :fixed="v.fixed"
+                           :align="v.align || 'left'" :key="index">
+            <template slot-scope="scope">
+              <q-popover :option='v.popoverOption' 
+                         :scope='scope' 
+                         :text="v.prop"
+                         :disabled="typeof v.popoverOption.disabled === 'function' ? v.popoverOption.disabled(scope) : v.popoverOption.disabled">
+              </q-popover>
             </template>
           </el-table-column>
 
@@ -434,10 +529,14 @@
               <el-popover
                 placement="left"
                 trigger="hover"
+                :disabled="!v.edit"
                 :content="$t('message.click')+$t('message.edit')"
-                :disabled="!v.edit">
-                <span slot="reference" :class="v.edit ? 'ellipsisLink' : ''">{{scope.row[v.prop] | noString}}</span>
+                >
+                <span slot="reference" :class="v.edit ? 'ellipsisLink' : ''">{{scope.row[v.prop] | noString}}</span>&nbsp;
               </el-popover>
+              <span v-if="v.hoverRow" class="hoverEdit">
+                <span @click="hoverRowClick(scope.row, v.prop, scope.$index)" :ref="'edit' + scope.row[innerObj.tableData.options && innerObj.tableData.options.rowKey ? innerObj.tableData.options.rowKey : 'id']" style="display: none">&nbsp;{{String(v.hoverRow) === 'true' ? $t('message.change') : v.hoverRow}}</span>
+              </span>
             </template>
           </el-table-column>
 
@@ -446,7 +545,7 @@
     </div>
     <!-- 分页 -->
     <div class="pagination-view"
-         v-if="innerObj.tableData.options.page">
+         v-if="innerObj.tableData.options && innerObj.tableData.options.page">
       <el-pagination :page-sizes="[10,20, 50, 100, 200, 300, 500]"
                      :page-size="originalWatch.pageSize"
                      @current-change="currentChange"
@@ -464,8 +563,11 @@
 <script>
 // import ellipsisView from '../ellipsisView'
 // import { InputTree } from 'components'
+import resize from './mixins/resize'
+import format from 'utils/format'
 export default {
   name: 'QFormTemplate',
+  mixins: [resize],
   props: {
     innerObj: {
       type: Object,
@@ -483,6 +585,7 @@ export default {
   },
   data() {
     return {
+      spanArr: [],
       highVisible: false,
       dataBodyObj: {},
       headerStyle: { // 表头样式
@@ -493,10 +596,54 @@ export default {
       originalWatch: this.innerObj.originalWatch // 需被检测刷新数据
     }
   },
+  mounted() {
+    if(this.innerObj&& this.innerObj.tableData && this.innerObj.tableData.options && this.innerObj.tableData.options.mergeTable) {
+      // this.getSpanArr(this.innerObj.tableData.dataBody)
+     this.innerObj.tableData.dataBody = this.mergeTableRow(this.innerObj.tableData.dataBody, this.innerObj.tableData.options.spanKey || [])
+    }
+  },
   methods: {
+    isArray(obj) {
+      return format.isArray(obj)
+    },
+    isObject(obj) {
+      return format.isObject(obj)
+    },
     /**
-     * 清空高级筛选
+     * 鼠标移入单元格
     */
+   cellMouseEnter(row, column, cell, event) {
+    const option = this.innerObj.tableData.options
+    const key = option && option.rowKey ? option.rowKey : 'id'
+    if(this.$refs['edit' + row[key]] && this.$refs['edit' + row[key]].length) {
+      this.$refs['edit' + row[key]].map(item => {
+        item.style.display = 'inline-block'
+      })
+    }
+    this.$emit('cellMouseLeave', row, column, cell, event)
+   },
+   /**
+    * 鼠标移出单元格
+   */
+  cellMouseLeave(row, column, cell, event) {
+    const option = this.innerObj.tableData.options
+    const key = option && option.rowKey ? option.rowKey : 'id'
+    if(this.$refs['edit' + row[key]] && this.$refs['edit' + row[key]].length) {
+      this.$refs['edit' + row[key]].map(item => {
+        item.style.display = 'none'
+      })
+    }
+    this.$emit('cellMouseLeave', row, column, cell, event)
+  },
+  /**
+   * hover 行点击事件
+  */
+  hoverRowClick(row, prop, index) {
+   this.$emit('hoverRowClick', row, prop, index)
+  },
+  /**
+   * 清空高级筛选
+  */
    resetHigh() {
      this.$refs.high.reset()
    },
@@ -582,22 +729,24 @@ export default {
      *  用于多选表格，切换某一行的选中状态，
     */
     toggleRowSelection(arr, selected = null) {
-      const tableData = this.innerObj.tableData
+      const option = this.innerObj.tableData.options
+      const key = option && option.rowKey ? option.rowKey : 'id'
       arr.forEach(element => {
-        if (this.dataBodyObj[element[tableData.options.rowKey || 'id']]) {
-          this.$refs[this.innerObj.tableData.options.ref || 'table'].toggleRowSelection(this.dataBodyObj[element[tableData.options.rowKey || 'id']], selected)
+        if (this.dataBodyObj[key]) {
+          this.$refs[this.innerObj.tableData.options.ref || 'table'].toggleRowSelection(this.dataBodyObj[element[key]], selected)
         }
       })
     },
-
 
     /**
      * 重新布局
      */
     doLayout() {
+      let ref = this.innerObj.tableData.options && this.innerObj.tableData.options.ref ? this.innerObj.tableData.options.ref : 'table'
+      let that = this
       setTimeout(() => {
-        this.$refs.table.doLayout()
-      }, 200)
+        that.$refs[ref].doLayout()
+      }, 100)
     },
     /**
       * 切换每页条数
@@ -650,25 +799,48 @@ export default {
     linkClick(row, prop, index) {
       this.$emit('linkClick', row, prop, index)
     },
-    //  表格头部 必填样式
-    renderH(h, data) {
-      return h('span', [
-        h(
-          'span',
-          {
-            class: 'is-required',
-            style: {
-              color: '#FF4D4F'
-            }
-          },
-          '* '
-        ),
-        h('span', data.column.label)
-      ])
+    /**
+     * 合并单元格
+    */
+    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+      // 外层的合并方法
+      if(this.innerObj&& this.innerObj.tableData && this.innerObj.tableData.options && this.innerObj.tableData.options.mergeTable && this.innerObj.tableData.options.arraySpanMethod) {
+        return this.innerObj.tableData.options.arraySpanMethod(row, column, rowIndex, columnIndex)
+      } else { // 默认合并方法
+        const span = column['property'] + '-span'
+        if(row[span]){
+            return row[span]
+        }
+      }
     },
-    //   表格头部 非必填样式
-    renderNo(h, data) {
-      return h('span', [h('span', data.column.label)])
+   mergeTableRow(data, merge) {
+      if (!merge || merge.length === 0) {
+        return data;
+      }
+      merge.forEach((m) => {
+        const mList = {};
+        data = data.map((v, index) => {
+          const rowVal = v[m];
+          // console.log('mList[rowVal] && mList[rowVal].newIndex === index', mList[rowVal] && mList[rowVal].newIndex === index, mList[rowVal])
+          if (mList[rowVal] && mList[rowVal].newIndex === index && data[mList[rowVal]['index']][m]) {
+            mList[rowVal]['num']++;
+            mList[rowVal]['newIndex']++;
+            data[mList[rowVal]['index']][m + '-span'].rowspan++;
+            v[m + '-span'] = {
+              rowspan: 0,
+              colspan: 0
+            };
+          } else {
+            mList[rowVal] = { num: 1, index: index, newIndex: index + 1 };
+            v[m + '-span'] = {
+              rowspan: 1,
+              colspan: 1
+            };
+          }
+          return v;
+        });
+      });
+      return data;
     }
   },
   components: {
@@ -698,10 +870,12 @@ export default {
       immediate: true,
       handler() {
         const tableData = this.innerObj.tableData
+        const option = this.innerObj.tableData.options
+        const key = option && option.rowKey ? option.rowKey : 'id'
         const _that = this
         if (tableData.options && tableData.options.indexType && tableData.options.indexType === 'selection') {
           tableData.dataBody.forEach(item => {
-            _that.dataBodyObj[item[tableData.options.rowKey || 'id']] = item
+            _that.dataBodyObj[item[key]] = item
           })
         }
       }
@@ -831,6 +1005,12 @@ export default {
         cursor: pointer;
         @include ellipsis;
       }
+      .hoverEdit{
+        padding-left: 10px;
+        cursor: pointer;
+        color: $--color-primary;
+        font-size: $--text-12;
+      }
     }
     .imgBox {
       @include fj;
@@ -856,7 +1036,11 @@ export default {
     text-align: right;
   }
 }
-
+.contentItem{
+  // display: inline-block;
+  padding: 4px;
+  border-bottom: 1px solid $--color-gray-e;
+}
 .selfDefine{
   width: auto;
   min-width: 100px;

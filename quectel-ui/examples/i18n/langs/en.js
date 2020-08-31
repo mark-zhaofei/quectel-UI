@@ -47,6 +47,7 @@ const en = {
     notInclude: 'Not Include',
     filterCondition: '筛选条件',
     highSearchCondition: 'Please improve the conditions.',
+    change: 'Change',
   },
   ...enLocale
 }

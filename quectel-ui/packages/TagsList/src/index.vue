@@ -7,7 +7,9 @@
       </div>
       <div class="right">
         <div class="tagsTop" :style="{'max-height': maxHeight}">
-          <el-tag class="tagItem" v-for="(item, index) in list" :key="index" :closable="String(item.closable) === 'false' ? false : true" :type="item.type" @click="click(item, index)" @close="close(item, index)">{{item[valueKey]}}</el-tag>
+        <draggable v-model="tagsList" :disabled='!isSort' handle=".sort" filter='.noSort' scroll @end='onEnd' :move='onMove' @change='change'>
+          <el-tag class="tagItem" :class="item.disabled ? 'noSort' : 'sort'" :style="{cursor: isSort ? 'move' : 'default' }" v-for="(item, index) in tagsList" :key="index" :closable="String(item.closable) === 'false' ? false : true" :type="item.type" @click="click(item, index)" @close="close(item, index)">{{item[valueKey]}}</el-tag>
+        </draggable>
         </div>
         <div class="tagsBottom" v-if="add">
          <slot name="add"></slot>
@@ -31,7 +33,7 @@ export default {
     label: { // 已选标签label
       type: String,
       default: () => {
-        return '已选择修改项'
+        return ''
       }
     },
     labelWidth: { // 标签宽度
@@ -63,14 +65,58 @@ export default {
       default: () => {
         return 'name'
       }
+    },
+    isSort: {
+      type: Boolean,
+      default: () => {
+        return false
+      }
+    }
+  },
+  data() {
+    return {
+      tagsList: []
     }
   },
   methods: {
+    /**
+     * 点进元素
+    */
     click(item, index) {
       this.$emit('click', item, index)
     },
+    /**
+     * 点击删除
+    */
     close(item, index) {
       this.$emit('close', item, index)
+    },
+    /**
+     * 移动元素时
+    */
+   onMove() {
+     this.$emit('onMove', this.tagsList)
+   },
+    /**
+     * 排序发生变化时
+    */
+   change() {
+     this.$emit('change', this.tagsList)
+   },
+    /**
+     * 拖动结束时
+    */
+   onEnd() {
+     this.$emit('onEnd', this.tagsList)
+   }
+  },
+  watch: {
+    'list': {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        this.tagsList = val && val.length ? JSON.parse(JSON.stringify(val)) : []
+      }
     }
   }
 }
@@ -103,6 +149,12 @@ export default {
       width: 100%;
       height: 40px;
       box-shadow:inset 0px 15px 10px -15px rgba(0,0,0,0.1);
+    }
+    .sort{
+      cursor: move;
+    }
+    .noSort{
+      cursor: default;
     }
   }
 }

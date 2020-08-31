@@ -48,6 +48,15 @@ Vue.use(VueRouter)
     path: '/switch',
     name: 'switch',
     component: () => import(/* webpackChunkName: "about" */ '../views/switch.vue')
+  },
+  {
+    path: '/tagsList',
+    name: 'switch',
+    component: () => import(/* webpackChunkName: "about" */ '../views/tagsList.vue')
+  }, {
+    path: '/Drawer',
+    name: 'Drawer',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Drawer.vue')
   }
 ]
 

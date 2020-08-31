@@ -96,12 +96,12 @@
 }
 
 // 去除表格边框
-.el-table--border th, .el-table--border td{
-  // border: none;
-}
-.el-table__body td{
-  border: none;
-}
+// .el-table--border th, .el-table--border td{
+//   // border: none;
+// }
+// .el-table__body td{
+//   border: none;
+// }
 // 表格斑马纹样式
 .el-table--striped .el-table__body tr.el-table__row--striped td {
   background: $--color-bg !important;

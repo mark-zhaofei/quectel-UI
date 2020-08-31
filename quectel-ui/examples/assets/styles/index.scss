@@ -5,6 +5,9 @@
 @import './transition.scss';
 @import './iview/iview.css';
 
+div{
+  outline: none;
+}
 /* font */
 .h1{
   font-weight: 550;
@@ -20,37 +23,37 @@
 }
 
 .font12 {
-  font-size: $--text-12;
+  font-size: $--text-12 !important;
 }
 .font14 {
-  font-size: $--text-14;
+  font-size: $--text-14 !important;
 }
 .font16 {
-  font-size: $--text-16;
+  font-size: $--text-16 !important;
 }
 .font18 {
-  font-size: $--text-18;
+  font-size: $--text-18 !important;
 }
 .font24 {
-  font-size: $--text-24;
+  font-size: $--text-24 !important;
 }
 .font26 {
-  font-size: $--text-26;
+  font-size: $--text-26 !important;
 }
 .font28 {
-  font-size: $--text-28;
+  font-size: $--text-28 !important;
 }
 .font30 {
-  font-size: $--text-30;
+  font-size: $--text-30 !important;
 }
 .font36 {
-  font-size: $--text-36;
+  font-size: $--text-36 !important;
 }
 .font38 {
-  font-size: $--text-38;
+  font-size: $--text-38 !important;
 }
 .font40 {
-  font-size: $--text-40;
+  font-size: $--text-40 !important;
 }
 
 /*flex*/

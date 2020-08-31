@@ -112,11 +112,24 @@ const timeFormat = (time) => {
   return time
 }
 
+const isArray = (obj) => {
+  return obj instanceof Array;
+}
+
+const isObject = (obj) => {
+  if (!(obj instanceof Array) && (obj instanceof Object)) {
+      return true;
+  }
+  return false;
+}
+
 export default {
   getWeekDate,
   getPrevNextDate,
   getPreMonth,
   getNextMonth,
   getDateYMD,
-  timeFormat
+  timeFormat,
+  isArray,
+  isObject
 }

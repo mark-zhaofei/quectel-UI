@@ -25,7 +25,7 @@
   </div>
 
   <!-- 表单弹框 -->
-  <q-form-dialog :option="dialogOption" :formList='formOption.fromList' :formModel='formOption.formModel' :rules='formOption.formRules' @close='dialogClose'></q-form-dialog>
+  <q-form-dialog :option="dialogOption" :formList='formOption.fromList' :formModel='formOption.formModel' :rules='formOption.formRules' @save='dialogClose' @close='dialogClose'></q-form-dialog>
 </div>
 </template>
 
@@ -46,7 +46,7 @@ export default {
         },
         fromList: [ // 表单列表
           {
-            formType: 'input',
+            formType: 'text',
             bind: 'key',
             label: 'input',
             prop: 'name'
@@ -54,6 +54,7 @@ export default {
             formType: 'radio',
             bind: 'radio',
             label: 'radio',
+            // button: true,
             options: [
               { label: '1', value: 1 },
               { label: '2', value: 2 }
@@ -125,7 +126,7 @@ export default {
           }
         ],
         formModel: {
-          key: '',
+          key: 'dxcbfcjkewdsbfcjkdebcv',
           radio: '1',
           checkbox: [],
           cascader: [],

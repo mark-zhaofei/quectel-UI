@@ -24,11 +24,11 @@ export default {
         highFilter: true,
         pageTitle: '123',
         buttonList: [
-          { type: 'primary', label: '其他按钮', dropdown: true, options: [
-            { type: 'primary', label: '其他按钮', func: '1' },
-          ] },
           { type: 'primary', label: '其他按钮', func: '1' },
-          { type: 'danger', label: '带icon', icon: 'el-icon-grape', func: '2' }
+          { type: 'danger', label: '带icon', icon: 'el-icon-grape', func: '2' },
+          {  dropdown: true, type: 'text', icon: 'el-icon-more', options: [
+            { type: 'primary', label: '其他按钮', func: '1' },
+          ] }
         ],
         formList: [
           {
@@ -55,23 +55,58 @@ export default {
         ],
         tableData: {
           options: {
+            ref: 'ref11',
             indexType: 'selection',
-            ref: 'userTable',
+            spanKey: ['name', 'rate'],
+            arraySpanMethod: (row, column) => {
+              const span = column['property'] + '-span'
+              if(row[span]){
+                  return row[span]
+              }
+            },
             page: true,
+            mergeTable: true,
             editDataHead: true
           },
           dataBody: [{
             id: '1',
-            name: '张三',
+            name: '',
             img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
             rate: 1,
-            switch: 'N'
+            switch: 'N',
+            data: [
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'}
+            ],
+            options: [
+              { label: 1, value: 1 },
+              { label: 2, value: 2 },
+              { label: 3, value: 3 }
+            ]
           }, {
-            id: 2,
-            name: '123',
+            id: '2',
+            name: '',
             img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
             rate: 2,
-            switch: 'Y'
+            switch: 'Y',
+            data: [
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'},
+                {name: '123'}
+            ]
           }, {
             id: 3,
             name: '123',
@@ -82,11 +117,11 @@ export default {
             id: 4,
             name: '123',
             img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
-            rate: 2,
+            rate: 3,
             switch: 'Y'
           }, {
             id: 5,
-            name: '123',
+            name: '张三',
             img: 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3556906815,2402486002&fm=26&gp=0.jpg',
             rate: 2,
             switch: 'Y'
@@ -104,29 +139,60 @@ export default {
             switch: 'Y'
           }],
           dataHead: [
-            { prop: 'name', label: this.$t('message.name') },
+            { prop: 'name', label: this.$t('message.name'), hoverRow: this.$t('message.name') },
             { prop: 'img', label: this.$t('message.name'), img: true },
-            { prop: 'name', label: this.$t('message.name'), input: true },
-            { prop: 'name', label: this.$t('message.name'), select: true, width: 190, options: [
-              { label: 1, value: 1 },
-              { label: 2, value: 2 },
-              { label: 3, value: 3 }
-            ] },
-            { prop: 'name', label: this.$t('message.name'), tag: true },
-            { prop: 'rate', label: this.$t('message.name'), rate: true, width: 100 },
+            { prop: 'name', label: this.$t('message.name') },
+            { prop: 'name', label: this.$t('message.name'), 
+              popoverOption: {
+                // disabled: (scope) => {
+                //   if(scope.row.data && scope.row.data.length) {
+                //     return false
+                //   } else {
+                //     return true
+                //   }
+                //   // console.log(scope)
+                // },
+                popoverWidth: 500,  
+                table: {
+                  data: 'data',
+                  column: [
+                    { prop: 'name', label: this.$t('message.name') },
+                    { prop: 'name', label: this.$t('message.name') }
+                  ]
+                }, 
+                title: 'name列表',
+                // content: [
+                //   {label: 'name', prop: 'name'},
+                //   {label: 'name', prop: 'name'},
+                //   {label: 'name', prop: 'name'},
+                //   {label: 'name', prop: 'name'},
+                //   {label: 'name', prop: 'name'}
+                // ]
+                // render: (h) => {
+                //   return h(
+                //     "el-button",
+                //     'name'
+                //   )
+                // }
+              }
+            },
+            { prop: 'name', label: this.$t('message.name'), width: 190, radioGroup: true, optionsKey: 'options' },
+            { prop: 'name', label: this.$t('message.name'), hoverRow: true},
+            { prop: 'rate', label: this.$t('message.name')},
             { prop: 'name', label: this.$t('message.name'), link: true },
             { prop: 'name', label: '双击事件' },
             { prop: 'name', label: this.$t('message.name'), sortable: 'custom' },
-            { prop: 'switch', label: this.$t('message.name'), switch: true, activeValue: 'Y', inactiveValue: 'N' },
+            { prop: 'switch', label: this.$t('message.name'),switch: true, activeValue: '张三', inactiveValue: '123' },
             { label: '嵌套表头', columns: [
-              { prop: 'name', label: this.$t('message.name') },
-              { prop: 'name', label: this.$t('message.name') }
+              { prop: 'name', label: this.$t('message.name'), hoverRow: true },
+              { prop: 'name', label: this.$t('message.name'), hoverRow: true }
             ] },
             {
               prop: 'createTime',
               label: this.$t('message.operate'),
               align: 'left',
-              width: 160
+              width: 160,
+              hoverRow: true
             }
           ]
         },

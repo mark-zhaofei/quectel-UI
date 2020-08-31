@@ -23,6 +23,12 @@
       <!-- 表单内容 -->
       <el-form class="formContent" :ref="option.formRef || 'ruleForm'" :model="formModel" v-if="formArr && formArr.length" :label-width="option.labelWidth || '80px'" :size="option.fromSize || 'mini'" :rules='rules' :disabled="option.formDisabled">
         <el-form-item v-for="(item, index) in formArr" :key="index" :label="item.label" :prop="item.prop">
+          <!-- 
+            仅文字显示
+           -->
+          <div v-if="item.formType === 'text'">
+            {{formModel[item.bind]}}
+          </div>
           <!--
           输入框
           bind: 绑定值   --必填
@@ -95,9 +101,9 @@
                        :clearable="item.clearable || false"
                        :multiple-limit="item.multipleLimit || 0">
               <el-option v-for="select in item.options"
-                         :key="select.value"
-                         :label="select.label"
-                         :value="select.value">
+                         :key="item.valueKey ? select[item.valueKey] : select.value"
+                         :label="item.labelKey ? select[item.labelKey] : select.label"
+                         :value="item.valueKey ? select[item.valueKey] : select.value">
               </el-option>
             </el-select>
           </div>
@@ -123,13 +129,15 @@
                          :placeholder="item.placeholder || $t('message.pleaseEnter')"
                          :disabled="item.disabled"
                          :props="{
-                        expandTrigger: item.expandTrigger || 'click',
-                        multiple: item.multiple || false,
-                        checkStrictly: item.checkStrictly || false,
-                        emitPath: item.emitPath || false,
-                        value: item.valueKey || 'value',
-                        label: item.labelKey || 'label'
-                      }">
+                          expandTrigger: item.expandTrigger || 'click',
+                          multiple: item.multiple || false,
+                          checkStrictly: item.checkStrictly || false,
+                          emitPath: item.emitPath || false,
+                          value: item.valueKey || 'value',
+                          label: item.labelKey || 'label',
+                          children: item.childrenKey || 'children',
+                          disabled: item.disabledKey || 'disabled'
+                        }">
             </el-cascader>
           </div>
           <!--
@@ -144,8 +152,19 @@
             是否显示边框 border
           -->
           <div v-if="item.formType === 'radio'">
-            <el-radio-group v-model="formModel[item.bind]" :disabled='item.disabled'>
-              <el-radio  v-for="(radio, index) in item.options" :key="index" :label="radio.value">{{radio.label}}</el-radio>
+            <el-radio-group v-model="formModel[item.bind]" :disabled='item.disabled' :size="item.size || 'small'">
+              <span v-if="item.button">
+                <el-radio-button v-for="(radio, index) in item.options" 
+                                 :key="index" 
+                                 :label="item.valueKey ? radio[item.valueKey] : radio.value" 
+                                 :border='radio.border'>{{item.labelKey ? radio[item.labelKey] : radio.label}}</el-radio-button>
+              </span>
+              <span v-else>
+                <el-radio v-for="(radio, index) in item.options" 
+                          :key="index" 
+                          :label="item.valueKey ? radio[item.valueKey] : radio.value" 
+                          :border='radio.border'>{{item.labelKey ? radio[item.labelKey] : radio.label}}</el-radio>
+              </span>
             </el-radio-group>
           </div>
 
@@ -162,7 +181,11 @@
           -->
           <div v-if="item.formType === 'checkbox'">
             <el-checkbox-group v-model="formModel[item.bind]" :disabled='item.disabled' :border='item.border'>
-              <el-checkbox label="复选框 A" v-for="(check, index) in item.options" :key="index" :disabled="check.disabled">{{check.label}}</el-checkbox>
+              <el-checkbox
+              v-for="(check, index) in item.options" 
+              :key="index" 
+              :label="item.valueKey ? check[item.valueKey] : check.value" 
+              :disabled="check.disabled">{{item.labelKey ? check[item.labelKey] : check.label}}</el-checkbox>
             </el-checkbox-group>
           </div>
 
@@ -215,6 +238,7 @@
             </el-input-number>
           </div>
           <!-- 自定义render函数 -->
+          <render-view v-if="item.render" :render='item.render' :index="index" :item='item'></render-view>
         </el-form-item>
       </el-form>
       <slot name="content-bottom"></slot>
@@ -298,7 +322,7 @@ export default {
      * 弹窗保存
     */
     saveDialog(name) {
-      if(this.rules) {
+      if(this.rules && this.$refs[name]) {
         this.$refs[name].validate((valid) => {
           if (valid) {
            this.$emit('save')
@@ -312,6 +336,24 @@ export default {
     },
     close() {
       this.$emit('close')
+    }
+  },
+  components: {
+    renderView: {
+      functional: true,
+      props: {
+        render: Function,
+        index: Number,
+        item: {
+          type: Object,
+          default: null
+        }
+      },
+      render: (h, ctx) => {
+        const params = ctx.props.item
+        const index = ctx.props.index
+        return ctx.props.render(h, params, index)
+      }
     }
   }
 }

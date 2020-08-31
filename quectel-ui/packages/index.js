@@ -27,6 +27,9 @@ import TagsList from './TagsList/index.js'
 import SelectLazy from './SelectLazy/index.js'
 import HighSearch from './HighSearch/index.js'
 import Switch from './Switch/index.js'
+import Popover from './Popover/index.js'
+import draggable from 'vuedraggable'
+import Drawer from './Drawer/index.js'
 
 
 const components = [
@@ -58,7 +61,10 @@ const components = [
   TagsList,
   SelectLazy,
   HighSearch,
-  Switch
+  Switch,
+  Popover,
+  draggable,
+  Drawer
 ]
 
 const install = function(Vue, opts = {}) {
@@ -112,5 +118,8 @@ export default {
   TagsList,
   SelectLazy,
   HighSearch,
-  Switch
+  Switch,
+  Popover,
+  draggable,
+  Drawer
 }

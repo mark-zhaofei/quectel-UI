@@ -47,6 +47,7 @@ const cn = {
     notInclude: '不包含',
     filterCondition: '筛选条件',
     highSearchCondition: '请完善条件',
+    change: '调整',
 
   },
   ...zhLocale

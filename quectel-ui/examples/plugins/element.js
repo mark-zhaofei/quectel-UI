@@ -6,6 +6,7 @@ import '../assets/styles/element.scss'
 
 // Vue.prototype.HTTP = { GET, GETURL, POST, POSTURL, PUT, DELETE, ALL, PUTURL }
 import {
+  Drawer,
   Scrollbar,
   Pagination,
   Dialog,
@@ -89,6 +90,7 @@ import {
 
 Vue.prototype.$ELEMENT = { size: Cookies.get('size') || 'medium' }
 
+Vue.use(Drawer)
 Vue.use(Scrollbar)
 Vue.use(Avatar)
 Vue.use(Pagination)

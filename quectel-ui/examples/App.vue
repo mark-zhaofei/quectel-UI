@@ -10,6 +10,8 @@
             <li><router-link tag='span' to="/tabs">Tabs 标签页组件</router-link></li>
             <li><router-link tag='span' to="/dialog">Dialog 弹框组件</router-link></li>
             <li><router-link tag="span" to='/switch'>Switch 开关组件</router-link></li>
+            <li><router-link tag="span" to='/tagsList'>tagsList 开关组件</router-link></li>
+            <li><router-link tag="span" to='/Drawer'>Drawer 开关组件</router-link></li>
         </ul>
         <router-view></router-view>
     </div>
@@ -37,12 +39,12 @@
   padding: 20px;
 }
 li{
-  display: inline;
+  display: inline-block;
   list-style-type: none;
   margin: 0;
   padding: 0;
-  margin: 0 10px;
-  border-right: 1px solid #000;
+  margin: 10px;
+  border-right: 1px solid #ccc;
   padding: 10px;
   color: red;
   cursor: pointer;

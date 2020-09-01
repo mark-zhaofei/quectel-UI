@@ -1,12 +1,15 @@
 <template>
   <div>
     <div class="center">
-      <img v-if="showImg" :src="nodata">
-      <div class="mt5 h18 color-subTitle">{{$t('message.noData')}}~~</div>
+      <div class="imgDiv">
+        <img v-if="showImg" :src="img || nodata">
+      </div>
+      <div class="noData">{{$t('message.noData')}}~~</div>
     </div>
   </div>
 </template>
 <script>
+  import nodata from './nodata.png'
 export default {
   name: 'QNoData',
   components: {},
@@ -16,11 +19,17 @@ export default {
       default: () => {
         return true
       }
+    },
+    img: {
+      type: String,
+      default: () => {
+        return ''
+      }
     }
   },
   data() {
     return {
-      nodata: 'https://hbimg.huabanimg.com/e40b41be2824d1eceb252132910fdd9f268da1d865be3-fqlOeH_fw658/format/webp'
+      nodata
     }
   },
   computed: {
@@ -33,5 +42,31 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.center{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  .imgDiv{
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    img{
+      margin: 0 auto;
+      width: auto;
+      height: auto;
+      max-width: 200px;
+      max-height: 200px;
+    }
+  }
+
+}
+.noData{
+  padding: 10px;
+  text-align: center;
+}
 </style>

@@ -12,6 +12,7 @@
             <li><router-link tag="span" to='/switch'>Switch 开关组件</router-link></li>
             <li><router-link tag="span" to='/tagsList'>tagsList 开关组件</router-link></li>
             <li><router-link tag="span" to='/Drawer'>Drawer 开关组件</router-link></li>
+            <li><router-link tag="span" to='/noData'>noData 暂无数据</router-link></li>
         </ul>
         <router-view></router-view>
     </div>

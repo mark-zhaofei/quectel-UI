@@ -4,7 +4,7 @@
     <div class="buttonList">
       <el-button v-if="options.add" class="button-item" type="primary" size="mini" icon="el-icon-plus" @click="btnClick('add')">{{$t('message.add') + options.addTitle}}</el-button>
       <span class="button-item" v-if="buttonList && buttonList.length">
-        <el-button v-for="(item, index) in buttonList" :key="index" :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="btnClick(item.func, item)">{{item.label}}</el-button>
+        <el-button v-for="(item, index) in buttonList" :key="index" :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="btnClick(item.func, item)" :plain='item.plain'>{{item.label}}</el-button>
       </span>
     </div>
     <div class="p1">
@@ -18,7 +18,7 @@
           <i class="el-icon-info color-warning"></i>&nbsp;
           {{$t('message.draggableTips')}}
         </div>
-      <div :style="{'max-height': defaultHeight + 'px', 'overflow-y': 'auto'}">
+      <div :style="{'max-height': defaultHeight, 'overflow-y': 'auto'}">
         <div class="px1">
           <el-tree class="filter-tree" :data="treeData" :props="defaultProps" default-expand-all
             :expand-on-click-node="false" :filter-node-method="filterMethod" ref="tree"
@@ -114,8 +114,8 @@ export default {
       default: () => []
     },
     defaultHeight: { // 默认高度
-      type: Number,
-      default: 500
+      type: [Number, String],
+      default: '500px'
     },
     treeData: { // tree 数据
       type: Array,
@@ -198,6 +198,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/*color*/
+.titleColor{
+  color: #333333;
+}
+.px1 { padding-left:  10px; padding-right:  10px }
+.mb1 { margin-bottom: 10px }
+.color-warning{
+  color: #f1a55a;
+}
+.font16{
+  font-size: 16px;
+}
+.full {
+  height: 100%;
+  max-width: 100% !important;
+  overflow: hidden;
+}
 .role-list {
   .title{
     font-weight: 550;

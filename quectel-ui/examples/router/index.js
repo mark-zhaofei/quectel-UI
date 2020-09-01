@@ -57,6 +57,10 @@ Vue.use(VueRouter)
     path: '/Drawer',
     name: 'Drawer',
     component: () => import(/* webpackChunkName: "about" */ '../views/Drawer.vue')
+  }, {
+    path: '/noData',
+    name: 'noData',
+    component: () => import(/* webpackChunkName: "about" */ '../views/noData.vue')
   }
 ]
 

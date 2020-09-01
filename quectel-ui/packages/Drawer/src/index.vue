@@ -42,7 +42,7 @@
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-            <el-button v-else-if="!item.hidden" :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="btnClick(item.func, item)">{{item.label}}</el-button>
+            <el-button v-else-if="!item.hidden" :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" :plain='item.plain' @click="btnClick(item.func, item)">{{item.label}}</el-button>
           </span>
           </div>
         </div>

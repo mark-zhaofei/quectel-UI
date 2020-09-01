@@ -18,7 +18,7 @@
           </span> 
           <span v-for="(item, index) in innerObj.buttonList" :key="index">
             <el-dropdown v-if="item.dropdown && !item.hidden" :trigger="item.trigger || 'hover'" placement='bottom' :hide-on-click='false'>
-              <el-button :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)">
+              <el-button :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)" :plain='item.plain'>
                 {{item.label}}
                 <i v-if='item.icon' :class="(item.icon && String(item.icon) !== 'true') ? 'item.icon' : 'el-icon-arrow-down el-icon--right'" ></i>
               </el-button>
@@ -28,7 +28,7 @@
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-            <el-button v-else-if="!item.hidden" :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)">{{item.label}}</el-button>
+            <el-button v-else-if="!item.hidden" :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)" :plain='item.plain'>{{item.label}}</el-button>
           </span>
         </div>
         <!-- 搜索列 -->
@@ -216,10 +216,9 @@
                 :show-header='innerObj.tableData.options && innerObj.tableData.options.showHeader'
                 :data="innerObj.tableData.dataBody"
                 :border="innerObj.tableData.options && (innerObj.tableData.options.border || innerObj.tableData.options.mergeTable)"
-                :stripe="innerObj.tableData.options && innerObj.tableData.options.stripe ? innerObj.tableData.options.stripe : true"
+                :stripe="innerObj.tableData.options && innerObj.tableData.options.stripe && String(innerObj.tableData.options.stripe) === 'false' ? false : true"
                 :height="innerObj.tableData.options && innerObj.tableData.options.height ? innerObj.tableData.options.height : '100'"
                 :max-height="innerObj.tableData.options ? innerObj.tableData.options.maxHeight : null"
-                :width="innerObj.tableData.options ? innerObj.tableData.options.width : ''"
                 :emptyText="innerObj.tableData.options && innerObj.tableData.options.emptyText ? innerObj.tableData.options.emptyText : '暂无数据'"
                 :default-sort="innerObj.tableData.options && innerObj.tableData.options.defaultSort ? innerObj.tableData.options.defaultSort : {}"
                 highlight-current-row
@@ -248,7 +247,7 @@
         </el-table-column>
         <template v-for="(v, index) in innerObj.tableData.dataHead">
           <!-- 自定义表头 -->
-          <el-table-column v-if="v.header && !v.hidden"
+          <!-- <el-table-column v-if="v.header && !v.hidden"
                            :label="v.label"
                            :width="v.width"
                            :fixed="v.fixed"
@@ -260,18 +259,28 @@
                           effect="dark"
                           :content="v.tooltip"
                           placement="top">
-                <i class="el-icon-question icon-primary"></i>
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
               </el-tooltip>
             </template>
-          </el-table-column>
+          </el-table-column> -->
 
           <!-- 操作按钮列 -->
-          <el-table-column v-else-if="v.render && !v.hidden"
+          <el-table-column v-if="v.render && !v.hidden"
                            :label="v.label"
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'"
                             :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <render-button slot="reference"
                              :item="v"
@@ -288,6 +297,16 @@
                            :width="v.width || 120"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope"
                       v-if="v.img">
               <el-tooltip effect="dark" :content="$t('message.view') + $t('message.picture')" placement="top">
@@ -323,6 +342,16 @@
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-link :type="v.linkType || 'primary'"
                        @click="linkClick(scope.row, v.prop, scope.$index)">{{scope.row[v.prop] | noString}}</el-link>
@@ -338,6 +367,16 @@
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-tag :type="v.type || 'success'"
                       :size="v.size || 'mini'" :effect="v.effect || 'light'" :hit="v.hit || false">{{scope.row[v.prop] | noString}}</el-tag>
@@ -352,6 +391,16 @@
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-switch v-model="scope.row[v.prop]"
                          :active-color="v.activeColor"
@@ -378,6 +427,16 @@
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-rate v-model="scope.row[v.prop]"
                        :colors="v.colors"
@@ -403,6 +462,16 @@
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-radio-group v-model="scope.row[v.prop]" 
                             :disabled="scope.row[v.disabledKey] || scope.row['disabled']" 
@@ -440,6 +509,16 @@
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-checkbox-group v-model="scope.row[v.prop]" 
                                 :disabled="scope.row[v.disabledKey] || scope.row['disabled']" 
@@ -459,6 +538,16 @@
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-input v-model="scope.row[v.prop]"
                         :size="v.size || 'mini'"
@@ -477,6 +566,16 @@
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-select v-model="scope.row[v.prop]"
                          :size="v.size || 'mini'"
@@ -506,6 +605,16 @@
                            :width="v.width"
                            :fixed="v.fixed"
                            :align="v.align || 'left'" :key="index">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <q-popover :option='v.popoverOption' 
                          :scope='scope' 
@@ -525,6 +634,16 @@
                            :sortable="v.sortable || false" :key="index"
                            :resizable="v.resizable || true"
                            :show-overflow-tooltip="v.showOverflowTooltip || true">
+            <template slot="header" v-if="v.header">
+              {{v.label}}
+              <el-tooltip class="item"
+                          v-if="v.tooltip"
+                          effect="dark"
+                          :content="v.tooltip"
+                          placement="top">
+                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+              </el-tooltip>
+            </template>
             <template slot-scope="scope">
               <el-popover
                 placement="left"
@@ -563,12 +682,25 @@
 <script>
 // import ellipsisView from '../ellipsisView'
 // import { InputTree } from 'components'
+import Sortable from 'sortablejs'
 import resize from './mixins/resize'
 import format from 'utils/format'
 export default {
   name: 'QFormTemplate',
   mixins: [resize],
   props: {
+    tableSort: { // 表格行排序 必须设置row-key
+      type: Boolean,
+      default: () => {
+        return false
+      }
+    },
+    sortHandle: {
+      type: String, 
+      default: () => {
+        return ''
+      }
+    },
     innerObj: {
       type: Object,
       required: true,
@@ -585,6 +717,7 @@ export default {
   },
   data() {
     return {
+      sortable: null,
       spanArr: [],
       highVisible: false,
       dataBodyObj: {},
@@ -601,8 +734,32 @@ export default {
       // this.getSpanArr(this.innerObj.tableData.dataBody)
      this.innerObj.tableData.dataBody = this.mergeTableRow(this.innerObj.tableData.dataBody, this.innerObj.tableData.options.spanKey || [])
     }
+    // 行排序
+    if(this.tableSort) {
+      this.rowDrop()
+    }
   },
   methods: {
+    //行拖拽
+    rowDrop() {
+      const _this = this
+      const $document = this.$refs[_this.innerObj.tableData.options.ref].$el || document
+      const tbody = $document.querySelector('.el-table__body-wrapper tbody')
+      if(!this.tableSort && this.sortable) {
+        this.sortable.destroy()
+        return false
+      }
+      this.sortable = Sortable.create(tbody, {
+        sort: _this.tableSort,
+        disabled: !_this.tableSort,
+        handle: _this.sortHandle,  //拖动列表项中的句柄选择器
+        onEnd({ newIndex, oldIndex }) {
+          const currRow = _this.innerObj.tableData.dataBody.splice(oldIndex, 1)[0]
+          _this.innerObj.tableData.dataBody.splice(newIndex, 0, currRow)
+          _this.$emit('onEnd', _this.innerObj.tableData.dataBody)
+        }
+      })
+    },
     isArray(obj) {
       return format.isArray(obj)
     },
@@ -694,9 +851,6 @@ export default {
     */
     dblclick(row, column, cell, event) {
       this.$emit('dblclick', row, column, cell, event)
-      if(row[column.property]) {
-        this.$message.success(`您双击了【${row[column.property]}】`)
-      }
     },
     /**
      * 清空搜索框值
@@ -865,6 +1019,9 @@ export default {
     // ellipsisView
   },
   watch: {
+    tableSort() {
+      this.rowDrop()
+    },
     'innerObj.tableData.dataBody': {
       deep: true,
       immediate: true,

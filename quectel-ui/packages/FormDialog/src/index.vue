@@ -45,6 +45,11 @@
                       :prefix-icon="item.prefixIcon"
                       :suffix-icon="item.suffixIcon"
                       :clearable="item.clearable"
+                      :show-word-limit='showLimit'
+                      :minlength='item.minlength'
+                      :maxlength='item.maxlength'
+                      :autosize='item.autosize || false'
+                      :rows='item.rows'
                       :placeholder="item.placeholder || $t('message.pleaseEnter')">
             </el-input>
           </div>
@@ -244,8 +249,8 @@
       <slot name="content-bottom"></slot>
       <span slot="footer" class="dialog-footer">
          <el-button v-if="option.reset" @click="resetForm(option.formRef || 'ruleForm')">{{option.resetText || $t('message.reset')}}</el-button>
-        <el-button @click="close">{{option.cancelText || $t('message.cancel')}}</el-button>
-        <el-button type="primary" @click="saveDialog(option.formRef || 'ruleForm')">{{option.confirmText || $t('message.confirm')}}</el-button>
+        <el-button @click="close" v-if="option.cancelBtn && String(option.cancelBtn) === 'false' ? false : true">{{option.cancelText || $t('message.cancel')}}</el-button>
+        <el-button type="primary" v-if="option.confirmBtn && String(option.confirmBtn) === 'false' ? false : true" @click="saveDialog(option.formRef || 'ruleForm')">{{option.confirmText || $t('message.confirm')}}</el-button>
       </span>
 
     </el-dialog>

@@ -48,6 +48,7 @@ const en = {
     filterCondition: '筛选条件',
     highSearchCondition: 'Please improve the conditions.',
     change: 'Change',
+    noData: 'No Data'
   },
   ...enLocale
 }

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <!-- <link rel="icon" href="<%= BASE_URL %>favicon.ico"> -->
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
@@ -13,5 +13,14 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+    <!-- <% for (var i in htmlWebpackPlugin.options.cdn && htmlWebpackPlugin.options.cdn.js) { %>
+        <script src="<%= htmlWebpackPlugin.options.cdn.js[i] %>"></script>
+        <% } %> -->
+        <!-- <script src="https://lib.baomitu.com/vue/latest/vue.js"></script>
+        <script src="https://lib.baomitu.com/vuex/latest/vuex.js"></script>
+        <script src="https://lib.baomitu.com/echarts/latest/echarts.js"></script>
+        <script src="https://lib.baomitu.com/vue-i18n/8.16.0/vue-i18n.js"></script>
+        <script src="https://lib.baomitu.com/echarts/4.2.1/echarts.min.js"></script>
+        <script src="https://lib.baomitu.com/element-ui/2.13.2/index.js"></script> -->
   </body>
 </html>

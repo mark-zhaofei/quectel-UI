@@ -1,7 +1,6 @@
 /**
  *  菜单中文
 */
-import zhLocale from 'element-ui/lib/locale/lang/zh-CN' // 引入element语言包
 const cn = {
   menu: {
     '/': '首页',
@@ -24,7 +23,6 @@ const cn = {
     stepsView: '步骤条',
     treeView: '树形控件',
     socket: '即时通讯'
-  },
-  ...zhLocale
+  }
 }
 export default cn

@@ -84,7 +84,7 @@ import {
   Loading,
   MessageBox,
   Message,
-  Notification,
+  // Notification,
   Avatar
 } from 'element-ui'
 
@@ -172,7 +172,7 @@ Vue.use(Loading.directive)
 Vue.prototype.$msgbox = MessageBox
 Vue.prototype.$alert = MessageBox.alert
 Vue.prototype.$prompt = MessageBox.prompt
-Vue.prototype.$notify = Notification
+// Vue.prototype.$notify = Notification
 Vue.prototype.$loading = {
   loading: null,
   normal(settings) {

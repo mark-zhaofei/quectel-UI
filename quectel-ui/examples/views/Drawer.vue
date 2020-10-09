@@ -88,10 +88,10 @@ export default {
         direction: 'rtl'
       },
       footerbutton: [
-        {label: '自定义按钮1', func: '1'},
-        {label: '自定义按钮2', func: '2'},
-        {label: '自定义按钮3', func: '3'},
-        {label: '自定义按钮4', func: '4'}
+        { label: '自定义按钮1', func: '1' },
+        { label: '自定义按钮2', func: '2' },
+        { label: '自定义按钮3', func: '3' },
+        { label: '自定义按钮4', func: '4' }
       ]
     }
   },

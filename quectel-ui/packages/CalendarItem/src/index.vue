@@ -35,7 +35,7 @@
 
 <script>
 export default {
-  name: 'QCalendarItem', 
+  name: 'QCalendarItem',
   props: {
     day: {
       type: String,

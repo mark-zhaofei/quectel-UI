@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-  import nodata from './nodata.png'
+import nodata from './nodata.png'
 export default {
   name: 'QNoData',
   components: {},

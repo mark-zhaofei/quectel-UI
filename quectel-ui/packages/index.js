@@ -11,7 +11,8 @@ import Cropper from './Cropper/index.js'
 import EditView from './EditView/index.js'
 import FormDialog from './FormDialog/index.js'
 import FormTemplate from './FormTemplate/index.js'
-import HeaderSearch from './HeaderSearch/index.js'
+import ButtonListView from './ButtonListView/index.js'
+// import HeaderSearch from './HeaderSearch/index.js'
 import IndexTabs from './IndexTabs/index.js'
 import InputTree from './InputTree/index.js'
 import NoData from './NoData/index.js'
@@ -31,6 +32,10 @@ import Popover from './Popover/index.js'
 import draggable from 'vuedraggable'
 import Drawer from './Drawer/index.js'
 
+// directive
+import Waves from './Waves/index.js'
+import Picture from './Picture/index.js'
+import Tooltip from './Tooltip/index.js'
 
 const components = [
   BarChart,
@@ -43,7 +48,8 @@ const components = [
   EditView,
   FormDialog,
   FormTemplate,
-  HeaderSearch,
+  ButtonListView,
+  // HeaderSearch,
   IndexTabs,
   InputTree,
   NoData,
@@ -67,12 +73,21 @@ const components = [
   Drawer
 ]
 
+const directive = [
+  Waves,
+  Picture,
+  Tooltip
+]
+
 const install = function(Vue, opts = {}) {
   // locale.use(opts.locale)
   // locale.i18n(opts.i18n)
 
   components.forEach(component => {
     Vue.component(component.name, component)
+  })
+  directive.forEach(directive => {
+    Vue.directive(directive.name, directive)
   })
   Vue.prototype.$notify = Notification
 
@@ -100,7 +115,8 @@ export default {
   EditView,
   FormDialog,
   FormTemplate,
-  HeaderSearch,
+  ButtonListView,
+  // HeaderSearch,
   IndexTabs,
   InputTree,
   NoData,

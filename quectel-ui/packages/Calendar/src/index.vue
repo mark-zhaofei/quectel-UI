@@ -56,7 +56,7 @@
 <script>
 import format from 'utils/format'
 export default {
-  name: 'QCalendar', 
+  name: 'QCalendar',
   watch: {
     firstWeekDay: {
       deep: true,

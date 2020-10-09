@@ -18,7 +18,7 @@
           <i class="el-icon-info color-warning"></i>&nbsp;
           {{$t('message.draggableTips')}}
         </div>
-      <div :style="{'max-height': defaultHeight, 'overflow-y': 'auto'}">
+      <div :style="{'min-height': minHeight, 'max-height': defaultHeight, 'overflow-y': 'auto'}">
         <div class="px1">
           <el-tree class="filter-tree" :data="treeData" :props="defaultProps" default-expand-all
             :expand-on-click-node="false" :filter-node-method="filterMethod" ref="tree"
@@ -112,6 +112,12 @@ export default {
     checklist: {
       type: Array,
       default: () => []
+    },
+    minHeight: {
+      type: String,
+      default: () => {
+        return '200px'
+      }
     },
     defaultHeight: { // 默认高度
       type: [Number, String],

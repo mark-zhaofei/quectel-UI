@@ -15,7 +15,6 @@
             <div style="height: 100px;"></div>
             <template v-for="i in 300">
                 <h1 :key="`h1${i}`" :id="`title-${i}`">{{ `title-${i}` }}</h1>
-  
 
             </template>
             <h1 id="lishi">李氏专跳</h1>
@@ -37,33 +36,33 @@
 </template>
 <script>
 export default {
-    data () {
-        return {
-            container: null,
-            value1: '1',
-            scrollCon: '',
-            con: 'div',
-            showNewLink: false
-        }
-    },
-    methods: {
-        changeCon () {
-            this.con = 'window';
-            this.scrollCon = undefined;
-        },
-        handleChange (newHref, oldHref) {
-            console.log(`${oldHref} => ${newHref}`)
-        },
-        handleSelect (href) {
-            console.log(`select ${href}`)
-        },
-        andLink () {
-            this.showNewLink = true;
-        }
-    },
-    mounted () {
-        this.scrollCon = this.$refs.listWrapper
+  data() {
+    return {
+      container: null,
+      value1: '1',
+      scrollCon: '',
+      con: 'div',
+      showNewLink: false
     }
+  },
+  methods: {
+    changeCon() {
+      this.con = 'window'
+      this.scrollCon = undefined
+    },
+    handleChange(newHref, oldHref) {
+      console.log(`${oldHref} => ${newHref}`)
+    },
+    handleSelect(href) {
+      console.log(`select ${href}`)
+    },
+    andLink() {
+      this.showNewLink = true
+    }
+  },
+  mounted() {
+    this.scrollCon = this.$refs.listWrapper
+  }
 }
 </script>
 <style lang="scss">

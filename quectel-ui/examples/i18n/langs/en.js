@@ -1,7 +1,6 @@
 /**
  * 页面英文
 */
-import enLocale from 'element-ui/lib/locale/lang/en' // 引入element语言包
 const en = {
   message: {
     edit: 'Edit',
@@ -49,7 +48,6 @@ const en = {
     highSearchCondition: 'Please improve the conditions.',
     change: 'Change',
     noData: 'No Data'
-  },
-  ...enLocale
+  }
 }
 export default en

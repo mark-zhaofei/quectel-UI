@@ -10,9 +10,10 @@
       :on-remove="handleRemove"
       :on-progress="progress"
       :on-change="change"
-      :before-upload="beforeUpload"
+      :before-upload="beforeUpload()"
       :on-success="success"
       :file-list="fileList"
+      :accept='accept'
       :show-file-list="showFileList"
       :auto-upload="autoUpload"
       :disabled="disabled">
@@ -94,6 +95,21 @@ export default {
     uploadRef: { // 上传附件的ref
       type: String,
       default: 'upload'
+    },
+    accept: {
+      type: String,
+      default: () => {
+        return ''
+      }
+    },
+    beforeUpload: {
+      type: Function,
+      default: () => {
+        const func = () => {
+          return true
+        }
+        return func
+      }
     }
   },
   components: {},
@@ -126,10 +142,10 @@ export default {
     handlePreview(file) {
       this.$emit('priview', file)
     },
-    beforeUpload(file) {
-      this.fileType = file.name
-      this.$emit('beforeUpload', file)
-    },
+    // beforeUpload(file) {
+    //   this.fileType = file.name
+    //   this.$emit('beforeUpload', file)
+    // },
     change(file, fileList) {
       this.$emit('change', file, fileList)
     },
@@ -137,7 +153,8 @@ export default {
       this.$emit('progress', event, file, fileList)
     },
     download(item) {
-      console.log(item.id)
+      // console.log(item.id)
+      this.$emit('download', item)
     },
     success(response, file, fileList) {
       this.$emit('success', response, file, fileList)

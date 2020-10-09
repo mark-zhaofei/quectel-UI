@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-  export default {
-    name: 'QButtonGroup'
-  };
+export default {
+  name: 'QButtonGroup'
+}
 </script>

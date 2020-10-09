@@ -25,7 +25,7 @@
               <el-col :span="9">
                 <el-select v-model="item.column" size="mini" filterable :placeholder="$t('message.pleaseChoose') + $t('message.filterKey')"
                   @change="handleData(item, index)">
-                  <el-option v-for="(item, index) of highList" :key="index" :value="item.fieldName" :label="$t('message')[`${highType}_${item.fieldName}`]"></el-option>
+                  <el-option v-for="(item, index) of highList" :key="index" :value="item.fieldName" :label="item[labelKey]"></el-option>
                 </el-select>
               </el-col>
               <el-col :span="6">
@@ -49,8 +49,8 @@
                   <el-select v-model="item.value" size="mini" filterable v-else>
                     <el-option v-for="(item2, index) of item.kindList"
                       :key="index"
-                      :value="item.flag == 'dict' ? item2.code : item2.id"
-                      :label="item2.name"></el-option>
+                      :value="item.flag == 'dict' ? item2.code : item2.value"
+                      :label="item2.label"></el-option>
                   </el-select>
                 </template>
 
@@ -60,13 +60,23 @@
                     v-model="item.value"
                     :type="item.flag"
                     size="mini"
+                    value-format="timestamp"
                   ></el-date-picker>
                 </template>
 
                 <!-- inputTree -->
-                <div v-else-if="item.flag == 'tree'">
-                  <q-input-tree :option="tree" :treeForm="item" @change="nodeclick"></q-input-tree>
-                </div>
+
+                <template v-else-if="item.flag == 'tree'">
+                  <el-cascader
+                    v-model="item.value"
+                    :options="item.values"
+                    :show-all-levels='false'
+                    size="mini"
+                    filterable
+                    :props="{ checkStrictly: true, emitPath: false }"
+                    clearable></el-cascader>
+                  <!-- <q-input-tree :option="tree" :treeForm="item" @change="nodeclick"></q-input-tree> -->
+                </template>
 
                 <!-- 输入框 -->
                 <template v-else-if="item.flag == 'input'">
@@ -95,7 +105,7 @@
 
 </template>
 <script>
-import format from 'utils/format'
+// import format from 'utils/format'
 export default {
   name: 'QHighSearch',
   props: {
@@ -118,6 +128,12 @@ export default {
     highType: {
       type: String,
       default: 'custom'
+    },
+    labelKey: {
+      type: String,
+      default: () => {
+        return 'labelName'
+      }
     }
   },
   data() {
@@ -149,20 +165,18 @@ export default {
   },
   methods: {
     getParmas() {
-      this.highParams.map((item) => {
-        if (item.flag === 'date' && this.highType === 'custom') {
-          item.value = format.timeFormat(item.value)
-        } else if (item.flag === 'date') {
-          item.value = item.value instanceof Date ? item.value.getTime() : item.value
-        }
-      })
+      // this.highParams.map((item) => {
+      //   if (item.flag === 'date' && this.highType === 'custom') {
+      //     item.value = format.timeFormat(item.value)
+      //   } else if (item.flag === 'date') {
+      //     item.value = new Date().getTime(item.value)
+      //   }
+      // })
       return this.highParams
     },
     saveDialog() {
-      let parmas = this.getParmas()
-      this.$emit('save', {
-        advanceQueries: parmas
-      })
+      const parmas = this.getParmas()
+      this.$emit('save', parmas)
     },
     reset() {
       this.highParams = [{
@@ -173,10 +187,8 @@ export default {
       this.close()
     },
     close() {
-      let parmas = this.getParmas()
-      this.$emit('close', {
-        advanceQueries: parmas
-      })
+      const parmas = this.getParmas()
+      this.$emit('close', parmas)
     },
     addCondition() {
       var existIndex = this.highParams.findIndex(item => {
@@ -203,10 +215,12 @@ export default {
       var exist = this.highList.find(res => {
         return res.fieldName === item.column
       })
+      console.log('exist', exist)
       if (exist) {
         this.$set(this.highParams[index], 'conditions', exist.conditions)
         this.$set(this.highParams[index], 'flag', exist.fieldType)
         this.$set(this.highParams[index], 'kindList', exist.values)
+        this.$set(this.highParams[index], 'values', exist.values)
         this.tree.trees = exist.values
         if (exist.fieldName === 'customer_id' && exist.values) {
           exist.values.forEach(res => {

@@ -37,33 +37,33 @@
     </div>
 </template>
 <script>
-    export default {
-        data () {
-            return {
-                m1: true,
-                disabled: true,
-                loading: false,
-                switch1: true
-            }
-        },
-        methods: {
-            change (status) {
-                console.log(status)
-            },
-            beforeChange () {
-                return new Promise((resolve, reject) => {
-                    this.$Modal.confirm({
-                        title: '切换确认',
-                        content: '您确认要切换开关状态吗？',
-                        onOk: () => {
-                            resolve();
-                        },
-                        onCancel: () => {
-                            reject();
-                        }
-                    });
-                });
-            }
-        }
+export default {
+  data() {
+    return {
+      m1: true,
+      disabled: true,
+      loading: false,
+      switch1: true
     }
+  },
+  methods: {
+    change(status) {
+      console.log(status)
+    },
+    beforeChange() {
+      return new Promise((resolve, reject) => {
+        this.$Modal.confirm({
+          title: '切换确认',
+          content: '您确认要切换开关状态吗？',
+          onOk: () => {
+            resolve()
+          },
+          onCancel: () => {
+            reject()
+          }
+        })
+      })
+    }
+  }
+}
 </script>

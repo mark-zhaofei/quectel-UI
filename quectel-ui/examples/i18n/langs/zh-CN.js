@@ -1,7 +1,6 @@
 /**
  * 页面中文
 */
-import zhLocale from 'element-ui/lib/locale/lang/zh-CN' // 引入element语言包
 const cn = {
   message: {
     edit: '编辑',
@@ -49,8 +48,6 @@ const cn = {
     highSearchCondition: '请完善条件',
     change: '调整',
     noData: '暂无数据'
-
-  },
-  ...zhLocale
+  }
 }
 export default cn

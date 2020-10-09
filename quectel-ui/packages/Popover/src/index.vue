@@ -67,7 +67,7 @@ export default {
   },
   data() {
     return {
-       innerObj: { 
+      innerObj: {
         tableData: {
           dataBody: [],
           dataHead: []
@@ -77,8 +77,8 @@ export default {
   },
   created() {
     if(this.option.table) {
-     this.innerObj.tableData.dataBody = this.scope.row[this.option.table.data]
-     this.innerObj.tableData.dataHead = this.option.table.column
+      this.innerObj.tableData.dataBody = this.scope.row[this.option.table.data]
+      this.innerObj.tableData.dataHead = this.option.table.column
     }
   },
   methods: {
@@ -89,7 +89,7 @@ export default {
       return format.isObject(obj)
     }
   },
-    components: {
+  components: {
     renderView: {
       functional: true,
       props: {

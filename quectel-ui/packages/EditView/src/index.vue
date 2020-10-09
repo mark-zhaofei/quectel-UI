@@ -35,76 +35,76 @@
   </div>
 </template>
 <script>
-  export default {
-    name: 'QEditView',
-    components: {
+export default {
+  name: 'QEditView',
+  components: {
+  },
+  props: {
+    length: {
+      type: Number,
+      default: 4
     },
-    props: {
-      length: {
-        type: Number,
-        default: 4
-      },
-      property: {
-        type: String,
-        default: ''
-      },
-      name: {
-        type: String,
-        default: ''
-      },
-      visible: {
-        type: Boolean,
-        default: false
-      },
-      label: {
-        type: String,
-        default: ''
-      },
-      // 校验属性
-      prop: {
-        type: String,
-        default: ''
-      },
-      // 校验表单数据
-      form: {
-        type: Object,
-        default: () => {}
-      },
-      // 校验规则
-      rules: {
-        type: Object,
-        default: () => {}
-      },
-      // 是否可编辑，默认为可编辑
-      editable: {
-        type: Boolean,
-        default: false
-      }
+    property: {
+      type: String,
+      default: ''
     },
-    data() {
-      return {
-      }
+    name: {
+      type: String,
+      default: ''
     },
-    computed: {
+    visible: {
+      type: Boolean,
+      default: false
     },
-    methods: {
-      cancel() {
-        this.$emit('cancel')
-      },
-      sure() {
-        this.$emit('sure')
-      },
-      edit() {
-        this.$emit('edit')
-      }
+    label: {
+      type: String,
+      default: ''
     },
-    mounted() {
+    // 校验属性
+    prop: {
+      type: String,
+      default: ''
     },
-    watch: {
-      visible() {
-      }
+    // 校验表单数据
+    form: {
+      type: Object,
+      default: () => {}
+    },
+    // 校验规则
+    rules: {
+      type: Object,
+      default: () => {}
+    },
+    // 是否可编辑，默认为可编辑
+    editable: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+    }
+  },
+  computed: {
+  },
+  methods: {
+    cancel() {
+      this.$emit('cancel')
+    },
+    sure() {
+      this.$emit('sure')
+    },
+    edit() {
+      this.$emit('edit')
+    }
+  },
+  mounted() {
+  },
+  watch: {
+    visible() {
     }
   }
+}
 </script>
 
 <style lang="scss">

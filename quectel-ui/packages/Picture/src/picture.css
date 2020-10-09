@@ -1,0 +1,10 @@
+.messageImgBox .messageImg {
+    max-width: 100%;
+    max-height: 600px;
+    overflow: auto;
+} 
+.messageImgBox.el-message-box{
+  width: auto;
+  min-width: 90%;
+  max-width: 90%;
+}

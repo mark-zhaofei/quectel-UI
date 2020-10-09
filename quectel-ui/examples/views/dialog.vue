@@ -25,7 +25,13 @@
   </div>
 
   <!-- 表单弹框 -->
-  <q-form-dialog :option="dialogOption" :formList='formOption.fromList' :formModel='formOption.formModel' :rules='formOption.formRules' @save='dialogClose' @close='dialogClose'></q-form-dialog>
+  <q-form-dialog :option="dialogOption" :footer='false' :formList='formOption.fromList' :formModel='formOption.formModel' :rules='formOption.formRules' @save='dialogClose' @close='dialogClose'>
+    <span slot="icon-right">
+      <el-tooltip class="item" effect="dark" :content="fullscreen ? $t('message.cancel') + $t('message.screen') : $t('message.screen')" placement="bottom">
+        <i class="iconfont contentColor font24 pointer" :class="fullscreen ? 'iconsuoxiaotuichuquanpingshouhui' : 'iconquanping1'"></i>&nbsp;
+      </el-tooltip>
+    </span>
+  </q-form-dialog>
 </div>
 </template>
 
@@ -79,13 +85,16 @@ export default {
               { label: '1', value: 1 }
             ]
           }, {
-            formType: 'select',
+            formType: 'selectLazy',
             bind: 'select',
             label: 'select',
+            labelKey: 'label',
+            valueKey: 'value',
             options: [
               { label: '1', value: 1 },
               { label: '2', value: 2 }
-            ]
+            ],
+            getData: this.getData
           }, {
             formType: 'date',
             bind: 'date',
@@ -139,6 +148,12 @@ export default {
     }
   },
   methods: {
+    getData() {
+      return new Promise(resolve => {
+        const data = [{ label: 1, value: 1 }]
+        resolve(data)
+      })
+    },
     /**
      * 弹框方法
      **/

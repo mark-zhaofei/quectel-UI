@@ -94,21 +94,21 @@ export default {
     /**
      * 移动元素时
     */
-   onMove() {
-     this.$emit('onMove', this.tagsList)
-   },
+    onMove() {
+      this.$emit('onMove', this.tagsList)
+    },
     /**
      * 排序发生变化时
     */
-   change() {
-     this.$emit('change', this.tagsList)
-   },
+    change() {
+      this.$emit('change', this.tagsList)
+    },
     /**
      * 拖动结束时
     */
-   onEnd() {
-     this.$emit('onEnd', this.tagsList)
-   }
+    onEnd() {
+      this.$emit('onEnd', this.tagsList)
+    }
   },
   watch: {
     'list': {

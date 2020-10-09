@@ -1,7 +1,6 @@
 /**
  *  菜单英文
 */
-import enLocale from 'element-ui/lib/locale/lang/en' // 引入element语言包
 const en = {
   menu: {
     '/': 'Home',
@@ -24,7 +23,6 @@ const en = {
     stepsView: 'Steps',
     treeView: 'Tree',
     socket: 'Socket'
-  },
-  ...enLocale
+  }
 }
 export default en

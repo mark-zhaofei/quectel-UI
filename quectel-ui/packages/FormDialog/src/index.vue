@@ -2,20 +2,23 @@
   <div class="formDialog">
     <el-dialog
       :class="{'changeStyle': changeStyle}"
+       v-loading="loading"
       :title="option.title"
       :visible="option.visible || false"
       :width="option.width || '50%'"
       append-to-body
-      :fullscreen="fullscreen"
+      :fullscreen="fullscreen || option.fullscreen"
       :close-on-click-modal="false"
       :show-close='false'
       :before-close="close">
-      <div slot="title"  class="fj dialog-title">
+      <div slot="title" class="fj dialog-title">
         <div class="font16 h3"> <i class="iconfont" :class="option.titleIcon"></i> &nbsp; {{option.title}}</div>
         <div class="titleIcon">
+          <slot name="icon-left"></slot>
           <el-tooltip class="item" effect="dark" :content="fullscreen ? $t('message.cancel') + $t('message.screen') : $t('message.screen')" placement="bottom">
             <i class="iconfont contentColor font24 pointer" :class="fullscreen ? 'iconsuoxiaotuichuquanpingshouhui' : 'iconquanping1'" @click="fullscreen = !fullscreen"></i>
           </el-tooltip>
+          <slot name="icon-right"></slot>
           <i class="iconfont iconiconddgb contentColor font24 pointer" :class="!fullscreen && changeStyle ? 'closeIcon' : ''" @click="close"></i>
         </div>
       </div>
@@ -23,7 +26,7 @@
       <!-- 表单内容 -->
       <el-form class="formContent" :ref="option.formRef || 'ruleForm'" :model="formModel" v-if="formArr && formArr.length" :label-width="option.labelWidth || '80px'" :size="option.fromSize || 'mini'" :rules='rules' :disabled="option.formDisabled">
         <el-form-item v-for="(item, index) in formArr" :key="index" :label="item.label" :prop="item.prop">
-          <!-- 
+          <!--
             仅文字显示
            -->
           <div v-if="item.formType === 'text'">
@@ -45,7 +48,7 @@
                       :prefix-icon="item.prefixIcon"
                       :suffix-icon="item.suffixIcon"
                       :clearable="item.clearable"
-                      :show-word-limit='showLimit'
+                      :show-word-limit='item.showLimit'
                       :minlength='item.minlength'
                       :maxlength='item.maxlength'
                       :autosize='item.autosize || false'
@@ -159,15 +162,15 @@
           <div v-if="item.formType === 'radio'">
             <el-radio-group v-model="formModel[item.bind]" :disabled='item.disabled' :size="item.size || 'small'">
               <span v-if="item.button">
-                <el-radio-button v-for="(radio, index) in item.options" 
-                                 :key="index" 
-                                 :label="item.valueKey ? radio[item.valueKey] : radio.value" 
+                <el-radio-button v-for="(radio, index) in item.options"
+                                 :key="index"
+                                 :label="item.valueKey ? radio[item.valueKey] : radio.value"
                                  :border='radio.border'>{{item.labelKey ? radio[item.labelKey] : radio.label}}</el-radio-button>
               </span>
               <span v-else>
-                <el-radio v-for="(radio, index) in item.options" 
-                          :key="index" 
-                          :label="item.valueKey ? radio[item.valueKey] : radio.value" 
+                <el-radio v-for="(radio, index) in item.options"
+                          :key="index"
+                          :label="item.valueKey ? radio[item.valueKey] : radio.value"
                           :border='radio.border'>{{item.labelKey ? radio[item.labelKey] : radio.label}}</el-radio>
               </span>
             </el-radio-group>
@@ -185,11 +188,12 @@
             是否显示边框 border
           -->
           <div v-if="item.formType === 'checkbox'">
-            <el-checkbox-group v-model="formModel[item.bind]" :disabled='item.disabled' :border='item.border'>
+            <el-checkbox-group v-model="formModel[item.bind]" :disabled='item.disabled'>
               <el-checkbox
-              v-for="(check, index) in item.options" 
-              :key="index" 
-              :label="item.valueKey ? check[item.valueKey] : check.value" 
+              v-for="(check, index) in item.options"
+              :key="index"
+              :border='item.border'
+              :label="item.valueKey ? check[item.valueKey] : check.value"
               :disabled="check.disabled">{{item.labelKey ? check[item.labelKey] : check.label}}</el-checkbox>
             </el-checkbox-group>
           </div>
@@ -220,6 +224,27 @@
           </div>
 
           <!--
+            select 分页
+            -------------必填--------
+            formType：switch --必填
+            bind: 绑定值   --必填
+            options: 数据源  --必填
+          -->
+          <div v-if="item.formType === 'selectLazy'">
+            <q-select-lazy :form="formModel"
+                           :model="item.bind"
+                           :placeholder="item.placeholder || $t('message.pleaseChoose')"
+                           :option="item.option || []"
+                           :allData="item.allData || []"
+                           :labelKey="item.labelKey"
+                           :valueKey="item.valueKey"
+                           :searchKey='item.searchKey'
+                           :getData="item.getData"
+                           :disabled='item.disabled'
+                           @changeData='(parmas)=>{return changeData(parmas, item)}'></q-select-lazy>
+          </div>
+
+          <!--
             计数器
             -------------必填--------
             formType：inputNumber --必填
@@ -247,7 +272,7 @@
         </el-form-item>
       </el-form>
       <slot name="content-bottom"></slot>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer" v-if="footer" class="dialog-footer">
          <el-button v-if="option.reset" @click="resetForm(option.formRef || 'ruleForm')">{{option.resetText || $t('message.reset')}}</el-button>
         <el-button @click="close" v-if="option.cancelBtn && String(option.cancelBtn) === 'false' ? false : true">{{option.cancelText || $t('message.cancel')}}</el-button>
         <el-button type="primary" v-if="option.confirmBtn && String(option.confirmBtn) === 'false' ? false : true" @click="saveDialog(option.formRef || 'ruleForm')">{{option.confirmText || $t('message.confirm')}}</el-button>
@@ -261,6 +286,18 @@
 export default {
   name: 'QFormDialog',
   props: {
+    footer: {
+      type: Boolean,
+      default: () => {
+        return true
+      }
+    },
+    loading: {
+      type: Boolean,
+      default: () => {
+        return false
+      }
+    },
     changeStyle: {
       type: Boolean,
       default: () => {
@@ -317,12 +354,32 @@ export default {
   },
   methods: {
     /**
+     * select 分页 改变
+    */
+    changeData(params, item) {
+    //  console.log('changeData')
+      this.$emit('changeData', params, item)
+    },
+    /**
+     * 分页 select
+    */
+    getData(parmas, item) {
+      this.$emit('getData', parmas, item)
+    },
+    /**
      * 重置弹框
     */
-   resetForm(name) {
-    this.$refs[name].resetFields();
-    this.$emit('reset')
-   },
+    resetForm(name) {
+      this.$refs[name].resetFields()
+      if(this.formArr && this.formArr.length) {
+        this.formArr.forEach(item => {
+          if(item.formType === 'text') {
+            this.formModel[item.bind] = ''
+          }
+        })
+      }
+      this.$emit('reset')
+    },
     /**
      * 弹窗保存
     */
@@ -330,11 +387,11 @@ export default {
       if(this.rules && this.$refs[name]) {
         this.$refs[name].validate((valid) => {
           if (valid) {
-           this.$emit('save')
+            this.$emit('save')
           } else {
-            return false;
+            return false
           }
-        });
+        })
       } else {
         this.$emit('save')
       }
@@ -430,7 +487,5 @@ export default {
   /deep/.el-select, .el-cascader, .el-date-editor, .el-input{
     width: 100%;
   }
-
-
 
 </style>

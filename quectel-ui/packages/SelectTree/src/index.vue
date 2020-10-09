@@ -128,7 +128,7 @@ export default {
         return result
       }
       data.forEach((item) => {
-        delete item.children
+        // delete item.children
       })
       const map = {}
       data.forEach((item) => {

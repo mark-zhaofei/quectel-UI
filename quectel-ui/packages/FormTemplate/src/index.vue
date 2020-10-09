@@ -15,21 +15,24 @@
                     size="mini"
                     icon="el-icon-plus"
                     @click="add">{{$t('message.add') + (innerObj.addTitle || innerObj.pageTitle || '')}}</el-button>
-          </span> 
-          <span v-for="(item, index) in innerObj.buttonList" :key="index">
+          </span>
+          <!-- <span v-for="(item, index) in innerObj.buttonList" :key="index">
             <el-dropdown v-if="item.dropdown && !item.hidden" :trigger="item.trigger || 'hover'" placement='bottom' :hide-on-click='false'>
               <el-button :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)" :plain='item.plain'>
                 {{item.label}}
                 <i v-if='item.icon' :class="(item.icon && String(item.icon) !== 'true') ? 'item.icon' : 'el-icon-arrow-down el-icon--right'" ></i>
               </el-button>
               <el-dropdown-menu slot="dropdown" v-if="item.options && item.options.length">
-                <el-dropdown-item v-for="(child, cIndex) in item.options" :key="cIndex">
-                  <span @click="topBtnClick(child.func, child)">{{child.label}}</span>
-                </el-dropdown-item>
+                <span v-for="(child, cIndex) in item.options" :key="cIndex">
+                  <el-dropdown-item v-if="!child.hidden">
+                    <span @click="topBtnClick(child.func, child)">{{child.label}}</span>
+                  </el-dropdown-item>
+                </span>
               </el-dropdown-menu>
             </el-dropdown>
             <el-button v-else-if="!item.hidden" :type="item.type || 'primary'" :size="item.size || 'mini'" :icon="item.icon" @click="topBtnClick(item.func, item)" :plain='item.plain'>{{item.label}}</el-button>
-          </span>
+          </span> -->
+          <button-list-view v-if="innerObj.buttonList && innerObj.buttonList.length" :align='innerObj.buttonAlign' :buttonList='innerObj.buttonList' @topBtnClick='topBtnClick'></button-list-view>
         </div>
         <!-- 搜索列 -->
         <div class="right" :style="{'justify-content': innerObj.buttonAlign === 'right' ? 'flex-start' : 'flex-end'}">
@@ -103,6 +106,7 @@
                 :disabled="item.disabled || false"
                 :readonly="item.readonly || false"
                 range-separator="-"
+                @change='originalWatchChange'
                 :start-placeholder="item.startPlaceholder || $t('message.StartDate')"
                 :end-placeholder="item.endPlaceholder || $t('message.EndDate')">
               </el-date-picker>
@@ -208,473 +212,556 @@
         -----------------可选--------------
         option： 表格设置
        -->
-      <el-table v-if="innerObj.tableData"
-                :ref="innerObj.tableData.options && innerObj.tableData.options.ref ? innerObj.tableData.options.ref : 'table'"
-                v-loading="loading"
-                element-loading-text="数据正在加载中"
-                :header-cell-style="headerStyle || {}"
-                :show-header='innerObj.tableData.options && innerObj.tableData.options.showHeader'
-                :data="innerObj.tableData.dataBody"
-                :border="innerObj.tableData.options && (innerObj.tableData.options.border || innerObj.tableData.options.mergeTable)"
-                :stripe="innerObj.tableData.options && innerObj.tableData.options.stripe && String(innerObj.tableData.options.stripe) === 'false' ? false : true"
-                :height="innerObj.tableData.options && innerObj.tableData.options.height ? innerObj.tableData.options.height : '100'"
-                :max-height="innerObj.tableData.options ? innerObj.tableData.options.maxHeight : null"
-                :emptyText="innerObj.tableData.options && innerObj.tableData.options.emptyText ? innerObj.tableData.options.emptyText : '暂无数据'"
-                :default-sort="innerObj.tableData.options && innerObj.tableData.options.defaultSort ? innerObj.tableData.options.defaultSort : {}"
-                highlight-current-row
-                :row-key="innerObj.tableData.options && innerObj.tableData.options.rowKey ? innerObj.tableData.options.rowKey : 'id'"
-                :tree-props="innerObj.tableData.options && innerObj.tableData.options.treeProps ? innerObj.tableData.options.treeProps : { hasChildren: 'hasChildren', children: 'children' }"
-                :span-method="innerObj.tableData.options && innerObj.tableData.options.mergeTable ? arraySpanMethod : null"
-                @selection-change="handleSelectionChange"
-                @sort-change="sortChange"
-                @header-dragend="headerDragend"
-                :default-expand-all="innerObj.tableData.options && innerObj.tableData.options.expandAll ? innerObj.tableData.options.expandAll : false"
-                @cell-mouse-enter='cellMouseEnter'
-                @cell-mouse-leave='cellMouseLeave'
-                @cell-dblclick='dblclick'>
-        <!--
-          列循环
-         -->
-        <!-- 列样式调整 -->
-        <!-- <el-table-column width="1" fixed="left" style="opacity: 0;"></el-table-column> -->
-        <!-- 序号列 -->
-        <el-table-column v-if="innerObj.tableData.options && innerObj.tableData.options.indexType"
-                         :type="innerObj.tableData.options.indexType || 'index'"
-                         :label="innerObj.tableData.options.indexLabel || '序号'"
-                         :align="innerObj.tableData.options.indexAlign || 'left'"
-                         :reserve-selection="innerObj.tableData.options && innerObj.tableData.options.indexType === 'selection' ? true : false"
-                         fixed="left">
-        </el-table-column>
-        <template v-for="(v, index) in innerObj.tableData.dataHead">
-          <!-- 自定义表头 -->
-          <!-- <el-table-column v-if="v.header && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-          </el-table-column> -->
-
-          <!-- 操作按钮列 -->
-          <el-table-column v-if="v.render && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'"
-                            :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <render-button slot="reference"
-                             :item="v"
-                             :row="scope.row"
-                             :render="v.render"
-                             :index="scope.$index">
-              </render-button>
-            </template>
+       <el-form :model="innerObj.tableData" style="height: 100%; _height: 100%; -o-height: 100%" :ref="innerObj.tableData.options && innerObj.tableData.options.tableFormRef ? innerObj.tableData.options.tableFormRef : 'tableFormRef'">
+        <el-table v-if="innerObj.tableData"
+                  :ref="innerObj.tableData.options && innerObj.tableData.options.ref ? innerObj.tableData.options.ref : 'table'"
+                  v-loading="loading"
+                  element-loading-text="数据正在加载中"
+                  :header-cell-style="headerStyle || {}"
+                  :show-header='innerObj.tableData.options && innerObj.tableData.options.showHeader'
+                  :data="innerObj.tableData.dataBody"
+                  :border="innerObj.tableData.options && (innerObj.tableData.options.border || innerObj.tableData.options.mergeTable)"
+                  :stripe="innerObj.tableData.options && innerObj.tableData.options.stripe && String(innerObj.tableData.options.stripe) === 'false' ? false : true"
+                  :height="innerObj.tableData.options && innerObj.tableData.options.height ? innerObj.tableData.options.height : '100'"
+                  :max-height="innerObj.tableData.options ? innerObj.tableData.options.maxHeight : null"
+                  :emptyText="innerObj.tableData.options && innerObj.tableData.options.emptyText ? innerObj.tableData.options.emptyText : '暂无数据'"
+                  :default-sort="innerObj.tableData.options && innerObj.tableData.options.defaultSort ? innerObj.tableData.options.defaultSort : {}"
+                  highlight-current-row
+                  :row-key="innerObj.tableData.options && innerObj.tableData.options.rowKey ? innerObj.tableData.options.rowKey : 'id'"
+                  :tree-props="innerObj.tableData.options && innerObj.tableData.options.treeProps ? innerObj.tableData.options.treeProps : { hasChildren: 'hasChildren', children: 'children' }"
+                  :span-method="innerObj.tableData.options && innerObj.tableData.options.mergeTable ? arraySpanMethod : null"
+                  @selection-change="handleSelectionChange"
+                  @sort-change="sortChange"
+                  @header-dragend="headerDragend"
+                  :default-expand-all="innerObj.tableData.options && innerObj.tableData.options.expandAll ? innerObj.tableData.options.expandAll : false"
+                  @cell-mouse-enter='cellMouseEnter'
+                  @cell-mouse-leave='cellMouseLeave'
+                  @cell-dblclick='dblclick'>
+          <!--
+            列循环
+          -->
+          <!-- 列样式调整 -->
+          <!-- <el-table-column width="1" fixed="left" style="opacity: 0;"></el-table-column> -->
+          <!-- 序号列 -->
+          <el-table-column v-if="innerObj.tableData.options && innerObj.tableData.options.indexType"
+                          :type="innerObj.tableData.options.indexType || 'index'"
+                          :label="innerObj.tableData.options.indexLabel || '序号'"
+                          :align="innerObj.tableData.options.indexAlign || 'left'"
+                          :selectable="innerObj.tableData.options && innerObj.tableData.options.indexType === 'selection' && innerObj.tableData.options.selectable ? innerObj.tableData.options.selectable : null"
+                          :reserve-selection="innerObj.tableData.options && innerObj.tableData.options.indexType === 'selection' ? true : false"
+                          fixed="left">
           </el-table-column>
+          <template v-for="(v, index) in innerObj.tableData.dataHead">
 
-          <!-- 图片 -->
-          <el-table-column v-else-if="v.img && !v.hidden"
-                           :label="v.label"
-                           :width="v.width || 120"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope"
-                      v-if="v.img">
-              <el-tooltip effect="dark" :content="$t('message.view') + $t('message.picture')" placement="top">
-                <div class="imgBox" v-picture='scope.row[v.prop]'>
-                  <img class="img"
-                      :src="scope.row[v.prop]">
+            <!-- 操作按钮列 -->
+            <el-table-column v-if="v.render && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'"
+                              :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <render-button slot="reference"
+                              :item="v"
+                              :row="scope.row"
+                              :render="v.render"
+                              :index="scope.$index">
+                </render-button>
+              </template>
+            </el-table-column>
+
+            <!-- 图片 -->
+            <el-table-column v-else-if="v.img && !v.hidden"
+                            :label="v.label"
+                            :width="v.width || 120"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope"
+                        v-if="v.img">
+                <el-tooltip effect="dark" :content="$t('message.view') + $t('message.picture')" placement="top">
+                  <div class="imgBox" v-picture='scope.row[v.prop]'>
+                    <img class="img"
+                        :src="scope.row[v.prop]">
+                  </div>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+
+            <!-- 嵌套表头 动态修改表格列显示与嵌套表头 慎同时使用 -->
+            <el-table-column v-else-if="v.columns && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'center'"
+                            :show-overflow-tooltip="v.showOverflowTooltip || true" :key="index">
+              <template>
+                <div v-for="(col, index) in v.columns"
+                    :key="index">
+                  <el-table-column :label="col.label"
+                                  :prop="col.prop"
+                                  :align="col.align || 'left'"
+                                  :show-overflow-tooltip="v.showOverflowTooltip || true"></el-table-column>
                 </div>
-              </el-tooltip>
-            </template>
-          </el-table-column>
+              </template>
+            </el-table-column>
 
-          <!-- 嵌套表头 动态修改表格列显示与嵌套表头 慎同时使用 -->
-          <el-table-column v-else-if="v.columns && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'center'"
-                           :show-overflow-tooltip="v.showOverflowTooltip || true" :key="index">
-            <template>
-              <div v-for="(col, index) in v.columns"
-                   :key="index">
-                <el-table-column :label="col.label"
-                                 :prop="col.prop"
-                                 :align="col.align || 'left'"
-                                 :show-overflow-tooltip="v.showOverflowTooltip || true"></el-table-column>
-              </div>
-            </template>
-          </el-table-column>
+            <!-- 文字链接 -->
+            <el-table-column v-else-if="v.link && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-link :type="v.linkType || 'primary'"
+                        @click="linkClick(scope.row, v.prop, scope.$index)">{{scope.row[v.prop] | noString}}</el-link>
+              </template>
+            </el-table-column>
 
-          <!-- 文字链接 -->
-          <el-table-column v-else-if="v.link && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <el-link :type="v.linkType || 'primary'"
-                       @click="linkClick(scope.row, v.prop, scope.$index)">{{scope.row[v.prop] | noString}}</el-link>
-            </template>
-          </el-table-column>
+            <!--
+              tag标签
+              size: 大小
+            -->
+            <el-table-column v-else-if="v.tag && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-tag :type="v.type || 'success'"
+                        :size="v.size || 'mini'" :effect="v.effect || 'light'" :hit="v.hit || false">{{scope.row[v.prop] | noString}}</el-tag>
+              </template>
+            </el-table-column>
 
-          <!--
-            tag标签
-            size: 大小
-          -->
-          <el-table-column v-else-if="v.tag && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <el-tag :type="v.type || 'success'"
-                      :size="v.size || 'mini'" :effect="v.effect || 'light'" :hit="v.hit || false">{{scope.row[v.prop] | noString}}</el-tag>
-            </template>
-          </el-table-column>
+            <!--
+              Switch 开关
+            -->
+            <el-table-column v-else-if="v.switch && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-switch v-model="scope.row[v.prop]"
+                          :active-color="v.activeColor"
+                          :inactive-color="v.inactiveColor"
+                          :active-text="v.activeText"
+                          :inactive-text="v.inactiveText"
+                          :active-value="v.activeValue"
+                          :inactive-value="v.inactiveValue"
+                          :disabled="scope.row[v.disabledKey] || scope.row['disabled'] || v.disabled"
+                          @change="switchChange(scope.row, v.prop, scope.$index)">
+                </el-switch>
+              </template>
+            </el-table-column>
 
-          <!--
-            Switch 开关
-          -->
-          <el-table-column v-else-if="v.switch && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <el-switch v-model="scope.row[v.prop]"
-                         :active-color="v.activeColor"
-                         :inactive-color="v.inactiveColor"
-                         :active-text="v.activeText"
-                         :inactive-text="v.inactiveText"
-                         :active-value="v.activeValue"
-                         :inactive-value="v.inactiveValue"
-                         :disabled="scope.row[v.disabledKey] || scope.row['disabled']"
-                         @change="switchChange(scope.row, v.prop, scope.$index)">
-              </el-switch>
-            </template>
-          </el-table-column>
+            <!--
+              Rate 评分组件
+              disabled	是否为只读
+              allowHalf	是否允许半选
+              colors icon颜色
+              showText 是否显示文字
+            -->
+            <el-table-column v-else-if="v.rate && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-rate v-model="scope.row[v.prop]"
+                        :colors="v.colors"
+                        :show-text="v.showText || false"
+                        :disabled="scope.row[v.disabledKey] || scope.row['disabled'] || v.disabled"
+                        :allow-half="v.allowHalf || false"></el-rate>
+              </template>
+            </el-table-column>
 
-          <!--
-            Rate 评分组件
-            disabled	是否为只读
-            allowHalf	是否允许半选
-            colors icon颜色
-            showText 是否显示文字
-           -->
-          <el-table-column v-else-if="v.rate && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <el-rate v-model="scope.row[v.prop]"
-                       :colors="v.colors"
-                       :show-text="v.showText || false"
-                       :disabled="scope.row[v.disabledKey] || scope.row['disabled']"
-                       :allow-half="v.allowHalf || false"></el-rate>
-            </template>
-          </el-table-column>
+            <!--
+              单选组
+              -------------必填--------
+              formType：cascader --必填
+              bind: 绑定值   --必填
+              options: 数据源  --必填
 
-          <!--
-            单选组
-            -------------必填--------
-            formType：cascader --必填
-            bind: 绑定值   --必填
-            options: 数据源  --必填
+              ------------可选----------
+              禁用 disabled
+              是否显示边框 border
+            -->
+            <el-table-column v-else-if="v.radioGroup && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-form-item :prop="v.rules ? ('dataBody.' + scope.$index + '.' + v.prop) : null"  :rules='v.rules && v.ruleFunc ? v.ruleFunc(scope.row, scope.$index) : {}'>
+                  <el-radio-group v-model="scope.row[v.prop]"
+                                :disabled="scope.row[v.disabledKey] || scope.row['disabled'] || v.disabled"
+                                :size="v.size || 'mini'">
+                    <span v-if="v.button">
+                      <el-radio-button v-for="(radio, rIndex) in (v.options || scope.row[v.optionsKey])"
+                                      :key="rIndex"
+                                      :label="v.valueKey ? radio[v.valueKey] : radio.value"
+                                      :border='radio.border'>{{v.labelKey ? radio[v.labelKey] : radio.label}}</el-radio-button>
+                    </span>
+                    <span v-else>
+                      <el-radio v-for="(radio, _index) in (v.options || scope.row[v.optionsKey])"
+                                :key="_index"
+                                :label="v.valueKey ? radio[v.valueKey] : radio.value"
+                                :border='radio.border'>{{v.labelKey ? radio[v.labelKey] : radio.label}}</el-radio>
+                    </span>
+                  </el-radio-group>
+                </el-form-item>
+              </template>
+            </el-table-column>
 
-            ------------可选----------
-            禁用 disabled
-            是否显示边框 border
-          -->
-          <el-table-column v-else-if="v.radioGroup && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <el-radio-group v-model="scope.row[v.prop]" 
-                            :disabled="scope.row[v.disabledKey] || scope.row['disabled']" 
-                            :size="v.size || 'mini'">
-              <span v-if="v.button">
-                <el-radio-button v-for="(radio, rIndex) in (v.options || scope.row[v.optionsKey])" 
-                                :key="rIndex" 
-                                :label="v.valueKey ? radio[v.valueKey] : radio.value" 
-                                :border='radio.border'>{{v.labelKey ? radio[v.labelKey] : radio.label}}</el-radio-button>
-              </span>
-              <span v-else>
-                <el-radio v-for="(radio, _index) in (v.options || scope.row[v.optionsKey])" 
-                          :key="_index" 
-                          :label="v.valueKey ? radio[v.valueKey] : radio.value" 
-                          :border='radio.border'>{{v.labelKey ? radio[v.labelKey] : radio.label}}</el-radio>
-              </span>
-            </el-radio-group>
-            </template>
-          </el-table-column>
-         
+            <!--
+              多选
+              -------------必填--------
+              formType：checkbox --必填
+              bind: 绑定值   --必填
+              options: 数据源  --必填
 
-          <!--
-            多选
-            -------------必填--------
-            formType：checkbox --必填
-            bind: 绑定值   --必填
-            options: 数据源  --必填
+              ------------可选----------
+              禁用 disabled
+              是否显示边框 border
+            -->
+            <el-table-column v-else-if="v.checkboxGroup"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-form-item :prop="v.rules ? ('dataBody.' + scope.$index + '.' + v.prop) : null"  :rules='v.rules && v.ruleFunc ? v.ruleFunc(scope.row, scope.$index) : {}'>
+                  <el-checkbox-group v-model="scope.row[v.prop]"
+                                    :disabled="scope.row[v.disabledKey] || scope.row['disabled'] || v.disabled"
+                                    :border='v.border'>
+                    <el-checkbox
+                    v-for="(check, _index) in  (v.options || scope.row[v.optionsKey])"
+                    :key="_index"
+                    :label="v.valueKey ? check[v.valueKey] : check.value"
+                    :disabled="check.disabled">{{v.labelKey ? check[v.labelKey] : check.label}}</el-checkbox>
+                  </el-checkbox-group>
+                </el-form-item>
+              </template>
+            </el-table-column>
 
-            ------------可选----------
-            禁用 disabled
-            是否显示边框 border
-          -->
-          <el-table-column v-else-if="v.checkboxGroup"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <el-checkbox-group v-model="scope.row[v.prop]" 
-                                :disabled="scope.row[v.disabledKey] || scope.row['disabled']" 
-                                :border='v.border'>
-                <el-checkbox
-                v-for="(check, _index) in  (v.options || scope.row[v.optionsKey])" 
-                :key="_index" 
-                :label="v.valueKey ? check[v.valueKey] : check.value" 
-                :disabled="check.disabled">{{v.labelKey ? check[v.labelKey] : check.label}}</el-checkbox>
-              </el-checkbox-group>
-            </template>
-          </el-table-column>
+            <!-- input 输入框 -->
+            <el-table-column v-else-if="v.input && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-form-item :prop="v.rules ? ('dataBody.' + scope.$index + '.' + v.prop) : null"  :rules='v.rules && v.ruleFunc ? v.ruleFunc(scope.row, scope.$index) : {}'>
+                  <el-input v-model="scope.row[v.prop]"
+                            :size="v.size || 'mini'"
+                            :type="v.inputType || 'text'"
+                            :prefix-icon="v.prefixIcon"
+                            :suffix-icon="v.suffixIcon"
+                            :clearable="v.clearable"
+                            :disabled="scope.row[v.disabledKey] || scope.row['disabled'] || v.disabled"
+                            :placeholder="v.placeholder || $t('message.pleaseEnter')"
+                            :validate-event='true'
+                            @input='changeInput($event)'></el-input>
+                </el-form-item>
+              </template>
+            </el-table-column>
 
-          <!-- input 输入框 -->
-          <el-table-column v-else-if="v.input && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <el-input v-model="scope.row[v.prop]"
-                        :size="v.size || 'mini'"
-                        :type="v.inputType || 'text'"
-                        :prefix-icon="v.prefixIcon"
-                        :suffix-icon="v.suffixIcon"
-                        :clearable="v.clearable"
-                        :disabled="scope.row[v.disabledKey] || scope.row['disabled']"
-                        :placeholder="v.placeholder || $t('message.pleaseEnter')"></el-input>
-            </template>
-          </el-table-column>
+            <!-- select 选择框 -->
+            <el-table-column v-else-if="v.select && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-form-item :prop="v.rules ? ('dataBody.' + scope.$index + '.' + v.prop) : null"  :rules='v.rules && v.ruleFunc ? v.ruleFunc(scope.row, scope.$index) : {}'>
+                  <el-select v-model="scope.row[v.prop]"
+                            :size="v.size || 'mini'"
+                            :placeholder="v.placeholder || $t('message.pleaseEnter')"
+                            :multiple="v.multiple || false"
+                            :filterable="v.filterable || false"
+                            :clearable="v.clearable || false"
+                            :disabled="scope.row[v.disabledKey] || scope.row['disabled'] || v.disabled"
+                            :multiple-limit="v.multipleLimit || 0">
+                    <el-option v-for="item in v.options"
+                              :key="item.value"
+                              :label="item.label"
+                              :value="item.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </template>
+            </el-table-column>
 
-          <!-- select 选择框 -->
-          <el-table-column v-else-if="v.select && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <el-select v-model="scope.row[v.prop]"
-                         :size="v.size || 'mini'"
-                         :placeholder="v.placeholder || $t('message.pleaseEnter')"
-                         :multiple="v.multiple || false"
-                         :filterable="v.filterable || false"
-                         :clearable="v.clearable || false"
-                         :disabled="scope.row[v.disabledKey] || scope.row['disabled']"
-                         :multiple-limit="v.multipleLimit || 0">
-                <el-option v-for="item in v.options"
-                           :key="item.value"
-                           :label="item.label"
-                           :value="item.value">
-                </el-option>
-              </el-select>
-            </template>
-          </el-table-column>
+            <!--
+              select 分页
+              -------------必填--------
+              formType：switch --必填
+              bind: 绑定值   --必填
+              options: 数据源  --必填
+            -->
+            <el-table-column v-else-if="v.selectLazy && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+                            <template slot="header" v-if="v.header">
+                              {{v.label}}
+                              <el-tooltip class="item"
+                                          v-if="v.tooltip"
+                                          effect="dark"
+                                          :content="v.tooltip"
+                                          placement="top">
+                                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                              </el-tooltip>
+                            </template>
+                            <template slot-scope="scope">
+                              <el-form-item :prop="v.rules ? ('dataBody.' + scope.$index + '.' + v.prop) : null"  :rules='v.rules && v.ruleFunc ? v.ruleFunc(scope.row, scope.$index) : {}'>
+                                <q-select-lazy :form="scope.row"
+                                              :model="v.prop"
+                                              :placeholder="v.placeholder || $t('message.pleaseChoose')"
+                                              :option="v.option || scope.row[v.optionKey] || []"
+                                              :allData="v.allData || scope.row[v.allDataKey] || []"
+                                              :labelKey="v.labelKey"
+                                              :valueKey="v.valueKey"
+                                              :searchKey='v.searchKey'
+                                              :getData="v.getData"
+                                              :disabled="scope.row[v.disabledKey] || scope.row['disabled'] || v.disabled"
+                                              @changeData='(parmas)=>{return changeLazyData(parmas, scope.row, scope.$index)}'>
+                                </q-select-lazy>
+                              </el-form-item>
+                            </template>
+            </el-table-column>
 
-          <!-- 
-            popoverOption 弹出框
+            <!--
+              popoverOption 弹出框
 
-            ----必填
-            content 弹出内容
-           -->
-          <el-table-column v-else-if="v.popoverOption && !v.hidden"
-                           :label="v.label"
-                           :width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'" :key="index">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <q-popover :option='v.popoverOption' 
-                         :scope='scope' 
-                         :text="v.prop"
-                         :disabled="typeof v.popoverOption.disabled === 'function' ? v.popoverOption.disabled(scope) : v.popoverOption.disabled">
-              </q-popover>
-            </template>
-          </el-table-column>
+              ----必填
+              content 弹出内容
+            -->
+            <el-table-column v-else-if="v.popoverOption && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <q-popover :option='v.popoverOption'
+                          :scope='scope'
+                          :text="v.prop"
+                          :disabled="typeof v.popoverOption.disabled === 'function' ? v.popoverOption.disabled(scope) : v.popoverOption.disabled">
+                </q-popover>
+              </template>
+            </el-table-column>
 
-          <!-- 其他 -->
-          <el-table-column v-else-if="!v.hidden"
-                           :prop="v.prop"
-                           :label="v.label"
-                           :min-width="v.width"
-                           :fixed="v.fixed"
-                           :align="v.align || 'left'"
-                           :sortable="v.sortable || false" :key="index"
-                           :resizable="v.resizable || true"
-                           :show-overflow-tooltip="v.showOverflowTooltip || true">
-            <template slot="header" v-if="v.header">
-              {{v.label}}
-              <el-tooltip class="item"
-                          v-if="v.tooltip"
-                          effect="dark"
-                          :content="v.tooltip"
-                          placement="top">
-                <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
-              </el-tooltip>
-            </template>
-            <template slot-scope="scope">
-              <el-popover
-                placement="left"
-                trigger="hover"
-                :disabled="!v.edit"
-                :content="$t('message.click')+$t('message.edit')"
-                >
-                <span slot="reference" :class="v.edit ? 'ellipsisLink' : ''">{{scope.row[v.prop] | noString}}</span>&nbsp;
-              </el-popover>
-              <span v-if="v.hoverRow" class="hoverEdit">
-                <span @click="hoverRowClick(scope.row, v.prop, scope.$index)" :ref="'edit' + scope.row[innerObj.tableData.options && innerObj.tableData.options.rowKey ? innerObj.tableData.options.rowKey : 'id']" style="display: none">&nbsp;{{String(v.hoverRow) === 'true' ? $t('message.change') : v.hoverRow}}</span>
-              </span>
-            </template>
-          </el-table-column>
+            <!--
+              popoverOption 弹出框
+              ----必填
+              content 弹出内容
+            -->
+            <el-table-column v-else-if="v.steps && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-steps :active="scope.row[v.prop]" finish-status="success" direction="vertical">
+                  <el-step v-for="(steps, s) in innerObj.tableData.dataBody" :key="s"></el-step>
+                </el-steps>
+              </template>
+            </el-table-column>
 
-        </template>
-      </el-table>
+            <!-- 树形多选 -->
+            <el-table-column v-else-if="v.treeCheck && !v.hidden"
+                            :label="v.label"
+                            :width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'" :key="index">
+              <template slot="header" slot-scope="scope">
+                <el-checkbox v-if="treeCheck[v.prop]" :indeterminate="treeCheck[v.prop].indeterminate" v-model="treeCheck[v.prop].check" @change="(value) => { return treecheckHead(value, v.prop)}">{{v.label}}</el-checkbox>
+              </template>
+              <template slot-scope="scope">
+                <el-checkbox :indeterminate="scope.row[v.indeterminateKey]"
+                             v-model="scope.row[v.prop]"
+                             :disabled="scope.row[v.disabledKey] || scope.row['disabled'] || v.disabled" @change="(value) => {return treeCheckChange(value, scope.row, scope.$index, v.prop)}">{{scope.row[v.labelKey]}}</el-checkbox>
+              </template>
+
+            </el-table-column>
+
+            <!-- 其他 -->
+            <el-table-column v-else-if="!v.hidden"
+                            :prop="v.prop"
+                            :label="v.label"
+                            :min-width="v.width"
+                            :fixed="v.fixed"
+                            :align="v.align || 'left'"
+                            :sortable="v.sortable || false" :key="index"
+                            :resizable="v.resizable || true"
+                            :show-overflow-tooltip="v.showOverflowTooltip || true">
+              <template slot="header" v-if="v.header">
+                {{v.label}}
+                <el-tooltip class="item"
+                            v-if="v.tooltip"
+                            effect="dark"
+                            :content="v.tooltip"
+                            placement="top">
+                  <i :class="v.tooltipClass || 'el-icon-question color-primary'"></i>
+                </el-tooltip>
+              </template>
+              <template slot-scope="scope">
+                <el-popover
+                  placement="left"
+                  trigger="hover"
+                  :disabled="!v.edit"
+                  :content="$t('message.click')+$t('message.edit')"
+                  >
+                  <span slot="reference" :class="v.edit ? 'ellipsisLink' : ''">{{scope.row[v.prop] | noString}}</span>&nbsp;
+                </el-popover>
+                <span v-if="v.hoverRow" class="hoverEdit">
+                  <span @click="hoverRowClick(scope.row, v.prop, scope.$index)" :ref="'edit' + scope.row[innerObj.tableData.options && innerObj.tableData.options.rowKey ? innerObj.tableData.options.rowKey : 'id']" style="display: none">&nbsp;{{String(v.hoverRow) === 'true' ? $t('message.change') : v.hoverRow}}</span>
+                </span>
+              </template>
+            </el-table-column>
+
+          </template>
+        </el-table>
+       </el-form>
     </div>
     <!-- 分页 -->
-    <div class="pagination-view"
-         v-if="innerObj.tableData.options && innerObj.tableData.options.page">
-      <el-pagination :page-sizes="[10,20, 50, 100, 200, 300, 500]"
-                     :page-size="originalWatch.pageSize"
-                     @current-change="currentChange"
-                     layout="total, prev, pager, next, sizes"
-                     :total="innerObj.totalCount"
-                     :current-page="originalWatch.pageNumber"
-                     @size-change="handleSizeChange"
-                     background></el-pagination>
+    <div class="pagination-view">
+      <div class="page-left" v-if="innerObj.tableData.footerButtomList && innerObj.tableData.footerButtomList.length">
+        <button-list-view :align='innerObj.buttonAlign' :buttonList='innerObj.tableData.footerButtomList' @topBtnClick='topBtnClick'></button-list-view>
+      </div>
+      <div class="page-right" v-if="innerObj.tableData.options && innerObj.tableData.options.page">
+        <el-pagination :page-sizes="originalWatch.pageSizes || [30, 50, 100, 200]"
+                      :page-size="originalWatch.pageSize"
+                      @current-change="currentChange"
+                      layout="total, prev, pager, next, sizes"
+                      :total="innerObj.totalCount"
+                      :current-page="originalWatch.pageNumber"
+                      @size-change="handleSizeChange"
+                      background></el-pagination>
+      </div>
     </div>
-    <q-high-search ref="high" :visible='highVisible' :highList='innerObj.highList' @close='highClose' @save='highSave'></q-high-search>
+    <q-high-search ref="high"  :visible='highVisible' :highList='innerObj.highList' :labelKey='innerObj.highLabelKey' @close='highClose' @save='highSave'></q-high-search>
     <slot name="dialogs"></slot>
   </div>
 </template>
@@ -685,10 +772,31 @@
 import Sortable from 'sortablejs'
 import resize from './mixins/resize'
 import format from 'utils/format'
+// import { ButtonListView, SlotHeader } from './index'
+// import ButtonListView from './buttonListView'
+// import SlotHeader from './slotHeader'
 export default {
   name: 'QFormTemplate',
   mixins: [resize],
   props: {
+    highValueKey: {
+      type: String,
+      default: () => {
+        return 'advanceQueries'
+      }
+    },
+    treeCheck: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    },
+    loading: {
+      type: Boolean,
+      default: () => {
+        return false
+      }
+    },
     tableSort: { // 表格行排序 必须设置row-key
       type: Boolean,
       default: () => {
@@ -696,7 +804,7 @@ export default {
       }
     },
     sortHandle: {
-      type: String, 
+      type: String,
       default: () => {
         return ''
       }
@@ -725,14 +833,12 @@ export default {
         background: '#f8f9fb !important',
         color: '#333333'
       },
-      loading: false,
       originalWatch: this.innerObj.originalWatch // 需被检测刷新数据
     }
   },
   mounted() {
-    if(this.innerObj&& this.innerObj.tableData && this.innerObj.tableData.options && this.innerObj.tableData.options.mergeTable) {
-      // this.getSpanArr(this.innerObj.tableData.dataBody)
-     this.innerObj.tableData.dataBody = this.mergeTableRow(this.innerObj.tableData.dataBody, this.innerObj.tableData.options.spanKey || [])
+    if(this.innerObj && this.innerObj.tableData && this.innerObj.tableData.options && this.innerObj.tableData.options.mergeTable) {
+      this.innerObj.tableData.dataBody = this.mergeTableRow(this.innerObj.tableData.dataBody, this.innerObj.tableData.options.spanKey || [])
     }
     // 行排序
     if(this.tableSort) {
@@ -740,10 +846,36 @@ export default {
     }
   },
   methods: {
-    //行拖拽
+    originalWatchChange() {
+      this.$emit('searchData')
+    },
+    /**
+     * 树形多选 头部点击
+    */
+    treecheckHead(value, prop) {
+      this.$emit('treecheckHead', value, prop)
+    },
+    /**
+     * 树形多选改变 子集
+    */
+    treeCheckChange(value, row, index, prop) {
+      this.$emit('treeCheckChange', value, row, index, prop)
+    },
+    /**
+     * changeLazyData
+    */
+    changeLazyData(parmas, row, index) {
+      this.$emit('changeLazyData', parmas, row, index)
+    },
+    changeInput() {
+      // console.log('changeInput')
+      // return new Error('必须年满18岁')
+      this.$forceUpdate()
+    },
+    // 行拖拽
     rowDrop() {
       const _this = this
-      const $document = this.$refs[_this.innerObj.tableData.options.ref].$el || document
+      const $document = this.$refs[_this.innerObj.tableData.options.ref] ? this.$refs[_this.innerObj.tableData.options.ref].$el : document
       const tbody = $document.querySelector('.el-table__body-wrapper tbody')
       if(!this.tableSort && this.sortable) {
         this.sortable.destroy()
@@ -752,7 +884,7 @@ export default {
       this.sortable = Sortable.create(tbody, {
         sort: _this.tableSort,
         disabled: !_this.tableSort,
-        handle: _this.sortHandle,  //拖动列表项中的句柄选择器
+        handle: _this.sortHandle, // 拖动列表项中的句柄选择器
         onEnd({ newIndex, oldIndex }) {
           const currRow = _this.innerObj.tableData.dataBody.splice(oldIndex, 1)[0]
           _this.innerObj.tableData.dataBody.splice(newIndex, 0, currRow)
@@ -769,69 +901,67 @@ export default {
     /**
      * 鼠标移入单元格
     */
-   cellMouseEnter(row, column, cell, event) {
-    const option = this.innerObj.tableData.options
-    const key = option && option.rowKey ? option.rowKey : 'id'
-    if(this.$refs['edit' + row[key]] && this.$refs['edit' + row[key]].length) {
-      this.$refs['edit' + row[key]].map(item => {
-        item.style.display = 'inline-block'
-      })
-    }
-    this.$emit('cellMouseLeave', row, column, cell, event)
-   },
-   /**
+    cellMouseEnter(row, column, cell, event) {
+      const option = this.innerObj.tableData.options
+      const key = option && option.rowKey ? option.rowKey : 'id'
+      if(this.$refs['edit' + row[key]] && this.$refs['edit' + row[key]].length) {
+        this.$refs['edit' + row[key]].map(item => {
+          item.style.display = 'inline-block'
+        })
+      }
+      this.$emit('cellMouseLeave', row, column, cell, event)
+    },
+    /**
     * 鼠标移出单元格
    */
-  cellMouseLeave(row, column, cell, event) {
-    const option = this.innerObj.tableData.options
-    const key = option && option.rowKey ? option.rowKey : 'id'
-    if(this.$refs['edit' + row[key]] && this.$refs['edit' + row[key]].length) {
-      this.$refs['edit' + row[key]].map(item => {
-        item.style.display = 'none'
-      })
-    }
-    this.$emit('cellMouseLeave', row, column, cell, event)
-  },
-  /**
+    cellMouseLeave(row, column, cell, event) {
+      const option = this.innerObj.tableData.options
+      const key = option && option.rowKey ? option.rowKey : 'id'
+      if(this.$refs['edit' + row[key]] && this.$refs['edit' + row[key]].length) {
+        this.$refs['edit' + row[key]].map(item => {
+          item.style.display = 'none'
+        })
+      }
+      this.$emit('cellMouseLeave', row, column, cell, event)
+    },
+    /**
    * hover 行点击事件
   */
-  hoverRowClick(row, prop, index) {
-   this.$emit('hoverRowClick', row, prop, index)
-  },
-  /**
+    hoverRowClick(row, prop, index) {
+      this.$emit('hoverRowClick', row, prop, index)
+    },
+    /**
    * 清空高级筛选
   */
-   resetHigh() {
-     this.$refs.high.reset()
-   },
+    resetHigh() {
+      this.$refs.high.reset()
+    },
     /**
      * 点击高级搜索
     */
-   highFilterClick() {
-     this.highVisible = true
-   },
-   /**
+    highFilterClick() {
+      this.highVisible = true
+    },
+    /**
     * 高级筛选取消
    */
-  highClose(value) {
-    this.innerObj.originalWatch = {
-      ...this.originalWatch,
-      ...value
-    }
-    this.$emit('searchData')
-    this.highVisible = false
-  },
-  /**
+    highClose(value) {
+      this.$set(this.innerObj.originalWatch, this.highValueKey, value)
+      this.$emit('searchData')
+      this.highVisible = false
+    },
+    /**
    * 高级筛选保存
   */
-  highSave(value) {
-    this.innerObj.originalWatch = {
-      ...this.originalWatch,
-      ...value
-    }
-    this.$emit('searchData')
-        this.highVisible = false
-  },
+    highSave(value) {
+      // this.innerObj.originalWatch = {
+      //   ...this.originalWatch,
+      //   ...value
+      // }
+      this.$set(this.innerObj.originalWatch, this.highValueKey, value)
+      this.$emit('searchData')
+      this.highVisible = false
+    },
     /**
      * 拖动表头
     */
@@ -896,11 +1026,15 @@ export default {
      * 重新布局
      */
     doLayout() {
-      let ref = this.innerObj.tableData.options && this.innerObj.tableData.options.ref ? this.innerObj.tableData.options.ref : 'table'
-      let that = this
-      setTimeout(() => {
+      const ref = this.innerObj.tableData.options && this.innerObj.tableData.options.ref ? this.innerObj.tableData.options.ref : 'table'
+      const that = this
+      console.log('doLayout', ref)
+      if(that.$refs[ref]) {
         that.$refs[ref].doLayout()
-      }, 100)
+      }
+      // setTimeout(() => {
+
+      // }, 100)
     },
     /**
       * 切换每页条数
@@ -958,47 +1092,46 @@ export default {
     */
     arraySpanMethod({ row, column, rowIndex, columnIndex }) {
       // 外层的合并方法
-      if(this.innerObj&& this.innerObj.tableData && this.innerObj.tableData.options && this.innerObj.tableData.options.mergeTable && this.innerObj.tableData.options.arraySpanMethod) {
+      if(this.innerObj && this.innerObj.tableData && this.innerObj.tableData.options && this.innerObj.tableData.options.mergeTable && this.innerObj.tableData.options.arraySpanMethod) {
         return this.innerObj.tableData.options.arraySpanMethod(row, column, rowIndex, columnIndex)
       } else { // 默认合并方法
         const span = column['property'] + '-span'
-        if(row[span]){
-            return row[span]
+        if(row[span]) {
+          return row[span]
         }
       }
     },
-   mergeTableRow(data, merge) {
+    mergeTableRow(data, merge) {
       if (!merge || merge.length === 0) {
-        return data;
+        return data
       }
       merge.forEach((m) => {
-        const mList = {};
+        const mList = {}
         data = data.map((v, index) => {
-          const rowVal = v[m];
+          const rowVal = v[m]
           // console.log('mList[rowVal] && mList[rowVal].newIndex === index', mList[rowVal] && mList[rowVal].newIndex === index, mList[rowVal])
           if (mList[rowVal] && mList[rowVal].newIndex === index && data[mList[rowVal]['index']][m]) {
-            mList[rowVal]['num']++;
-            mList[rowVal]['newIndex']++;
-            data[mList[rowVal]['index']][m + '-span'].rowspan++;
+            mList[rowVal]['num']++
+            mList[rowVal]['newIndex']++
+            data[mList[rowVal]['index']][m + '-span'].rowspan++
             v[m + '-span'] = {
               rowspan: 0,
               colspan: 0
-            };
+            }
           } else {
-            mList[rowVal] = { num: 1, index: index, newIndex: index + 1 };
+            mList[rowVal] = { num: 1, index: index, newIndex: index + 1 }
             v[m + '-span'] = {
               rowspan: 1,
               colspan: 1
-            };
+            }
           }
-          return v;
-        });
-      });
-      return data;
+          return v
+        })
+      })
+      return data
     }
   },
   components: {
-    // InputTree,
     renderButton: {
       functional: true,
       props: {
@@ -1019,8 +1152,17 @@ export default {
     // ellipsisView
   },
   watch: {
-    tableSort() {
-      this.rowDrop()
+    'treeCheck': {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        this.treeCheckCopy = val
+      }
+    },
+    tableSort(val) {
+      if(val) {
+        this.rowDrop()
+      }
     },
     'innerObj.tableData.dataBody': {
       deep: true,
@@ -1065,6 +1207,7 @@ export default {
 </script>
 
 <style lang='scss' scoped>
+
 .ellipsisLink:hover{
  border-bottom: 1px solid $--color-primary;
  color: $--color-primary;
@@ -1102,7 +1245,7 @@ export default {
       flex: 1;
       @include flex-wrap;
       > * {
-        margin: 0 0 10px 10px;
+        margin: 0 5px 10px 5px;
         float: left;
       }
       min-width: 200px;
@@ -1119,7 +1262,7 @@ export default {
         width: 160px;
       }
       > * {
-        margin: 0 10px 10px 0;
+        margin: 0 5px 10px 5px;
         // float: left;
       }
     }
@@ -1128,6 +1271,11 @@ export default {
   .search-content {
     flex: 1;
     height: 680px; // 必须设，随意传值，但一定不能是百分比，否则在IE上会出现无限加载的BUG
+    -prefix-box-flex: 1;
+    -webkit-box-flex: 1;
+    -webkit-flex: auto;
+    -moz-box-flex: auto;
+    -ms-flex: 1;
     // overflow-y: auto;
     .el-table {
       height: 100% !important;
@@ -1189,12 +1337,23 @@ export default {
     }
   }
   .pagination-view {
-    padding: 20px 0;
-    text-align: right;
+    @include fj();
+    align-items: center;
+    align-content: center;
+    padding: 20px 0 20px 20px;
+    width: 100%;
+    .page-left{
+      flex: 1;
+      align-self: center;
+    }
+    .page-right{
+      flex: 1;
+      text-align: right;
+      align-self: flex-end;
+    }
   }
 }
 .contentItem{
-  // display: inline-block;
   padding: 4px;
   border-bottom: 1px solid $--color-gray-e;
 }

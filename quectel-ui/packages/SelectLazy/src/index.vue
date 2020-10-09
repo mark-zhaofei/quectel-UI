@@ -1,9 +1,19 @@
 <template>
-  <el-select v-model="form[value]" size="mini" clearable filterable remote :remote-method="remoteMethod"
-    :loading="loading" v-el-select-loadmore="loadmore" :form="form"
-    :placeholder="placeholder" @change="change">
+  <el-select v-model="form[value]"
+            size="mini"
+            clearable
+            filterable
+            remote
+            :disabled='disabled'
+            :remote-method="remoteMethod"
+            :loading="loading"
+            v-el-select-loadmore="loadmore"
+            :form="form"
+            :placeholder="placeholder"
+            @focus='focus'
+            @change="change">
     <slot name="option">
-      <el-option v-for="(item, index) of optData" :key="index" :label="item.label" :value="item[id]"></el-option>
+      <el-option v-for="(item, index) of optData" :key="index" :label="item[labelKey]" :value="item[valueKey]"></el-option>
     </slot>
   </el-select>
 </template>
@@ -31,8 +41,13 @@ export default {
       }
     }
   },
-  components: {},
   props: {
+    disabled: {
+      type: Boolean,
+      default: () => {
+        return false
+      }
+    },
     placeholder: {
       type: String,
       default: ''
@@ -45,21 +60,29 @@ export default {
       type: Array,
       default: () => []
     },
-    allData: {
-      type: Array,
-      default: () => []
-    },
     form: {
       type: Object,
       default: () => {}
     },
-    label: {
+    labelKey: {
       type: String,
       default: 'name'
     },
-    id: {
+    valueKey: {
       type: String,
-      default: 'userId'
+      default: 'id'
+    },
+    searchKey: {
+      type: String,
+      default: () => {
+        return 'key'
+      }
+    },
+    getData: Function
+  },
+  computed: {
+    value() {
+      return this.model
     }
   },
   data() {
@@ -70,37 +93,54 @@ export default {
         pageNumber: 1
       },
       optData: [],
-      allOptData: [],
-      value: this.model
+      allOptData: []
+      // value: this.model
     }
   },
-  computed: {
+  mounted() {
+    // this.getDataList()
   },
   methods: {
     remoteMethod(query) {
+      // console.log(
+      //   query
+      // )
       if (query !== '') {
         this.loading = true
         setTimeout(() => {
           this.loading = false
-          this.optData = this.allOptData.filter(item => {
-            const name = item.label.toLowerCase()
-            return name.indexOf(query.toLowerCase()) > -1
-          })
+          this.params = {
+            pageSize: 10,
+            pageNumber: 1,
+            [this.searchKey]: query
+          }
+          this.getDataList()
         }, 200)
       } else {
-        this.$emit('getData')
+        this.params = {
+          pageSize: 10,
+          pageNumber: 1
+        }
+        this.getDataList()
       }
+    },
+    getDataList() {
+      this.getData(this.params, this.option).then(data => {
+        this.optData = data
+      })
+    },
+    focus() {
+      this.getDataList()
     },
     loadmore() {
       this.params.pageSize = this.params.pageSize + 10
-      this.$emit('getData', this.params)
+      this.getDataList()
     },
     change(val) {
+      // console.log(val)
       this.form[this.model] = val
       this.$emit('changeData', val)
     }
-  },
-  mounted() {
   },
   watch: {
     option: {

@@ -11,14 +11,14 @@
     </div>
 </template>
 <script>
-    export default {
-        data () {
-            return {
-                split1: 0.6,
-                min1: '400px'
-            }
-        },
+export default {
+  data() {
+    return {
+      split1: 0.6,
+      min1: '400px'
     }
+  }
+}
 </script>
 <style>
     .demo-split{

@@ -32,10 +32,16 @@
 export default {
   name: 'QIndexTabs',
   props: {
+    remote: {
+      type: Boolean,
+      default: () => {
+        return false
+      }
+    },
     transition: {
       type: Boolean,
       default: () => {
-        return false  
+        return false
       }
     },
     innerList: {
@@ -71,8 +77,10 @@ export default {
     }
   },
   mounted() {
-    console.log(this.$route.params.activeName,  this.tabsList[0].name)
-    this.activeName = this.$route.params.activeName ? this.$route.params.activeName : this.tabsList[0].name
+    // console.log(this.$route.params.activeName,  this.tabsList[0].name)
+    if(!this.remote) {
+      this.activeName = this.$route.params.activeName ? this.$route.params.activeName : this.tabsList[0].name
+    }
   },
   methods: {
     /**

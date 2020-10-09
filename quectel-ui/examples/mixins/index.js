@@ -1,16 +1,7 @@
-import waves from '../directive/waves/waves.js'
-import picture from '../directive/picture/picture.js'
+
 import v from 'utils/validate'
 import Lang from 'utils/Lang'
 const mixin = {
-  data() {
-    return {}
-  },
-  computed: {},
-  directives: {
-    waves,
-    picture
-  },
   methods: {
     // 校验
     check(rules) {

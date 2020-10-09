@@ -113,14 +113,14 @@ const timeFormat = (time) => {
 }
 
 const isArray = (obj) => {
-  return obj instanceof Array;
+  return obj instanceof Array
 }
 
 const isObject = (obj) => {
   if (!(obj instanceof Array) && (obj instanceof Object)) {
-      return true;
+    return true
   }
-  return false;
+  return false
 }
 
 export default {

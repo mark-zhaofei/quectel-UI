@@ -11,11 +11,22 @@
 @mixin flex-nowrap {
   display: flex;
   flex-wrap: nowrap;
+  // display:box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 @mixin flex-wrap {
-  display: flex;
   flex-wrap: wrap;
+  // display:box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 @mixin flex-center($justify, $align) {
@@ -25,8 +36,13 @@
 }
 
 @mixin flex-column {
-  display: flex;
   flex-direction: column;
+  // display:box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 @mixin count-ul-list {}

@@ -1,7 +1,6 @@
 /**
  * 页面英文
 */
-import enLocale from 'element-ui/lib/locale/lang/en' // 引入element语言包
 const en = {
   date: {
     Monday: 'Monday',
@@ -18,7 +17,6 @@ const en = {
     minutes: ' minutes',
     hours: ' hours',
     days: ' days'
-  },
-  ...enLocale
+  }
 }
 export default en

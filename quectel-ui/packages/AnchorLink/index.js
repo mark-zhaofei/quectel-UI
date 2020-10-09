@@ -1,5 +1,4 @@
 
-
 import AnchorLink from '../Anchor/src/AnchorLink.vue'
 
 /* istanbul ignore next */
